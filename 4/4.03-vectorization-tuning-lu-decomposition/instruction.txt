@@ -1,0 +1,54 @@
+NOTE: this  lab follows the  discussion in  Section 4.3.3 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+The code in this lab  demonstrates LU decomposition of small matrices.
+You will  learn to optimize  performance by regularizing  vector loops
+and using  compiler hints  that relax some  of the runtime  checks for
+data alignment and pointer aliasing.
+
+0. Obtain baseline performance on the host ("make run-cpu") and on the
+   coprocessor ("make run-mic").
+
+1.  Apply  strength  reduction  to  line  16.   compile  and  run  the
+   application to see the performance improvement
+
+2. Currently  the number of  iteration for the  inner j-loop is  not a
+   multiple of the vector length. Thus the excess elements are handled
+   differently from the rest, leading to some overhead.
+
+   We can  resolve this  by "padding" the  number of iteration  on the
+   inner loop. The application  will computing extra elements, however
+   it will lead to a  performance improvement. Furthermore for the MIC
+   architecture, which requires alignment for vectorization, this will
+   also align the data.
+   
+   Implement this "padding" of number of iteration for the inner loop.
+   Note however,  that this will  cause incorrect results  because the
+   bottom half  of "A"  matrix will be  overwritten. You will  need to
+   create a placeholder array to hold the L, and copy the data back at
+   the end. again,  the benefit from the reduced  overhead will offset
+   the extra copy operation.
+
+   Compile and run the application.
+ 	  
+3.  Let's  add  a couple  of  compiler  hints  to help  the  compiler.
+   Although we  as a programmer know  that the inner  j-loop is always
+   aligned, the  compiler does  not know this.  Thus it will  insert a
+   check  in the  executable  that  checks if  the  requested data  is
+   aligned. Insert the appropriate pragma to disable this behavior.
+   
+   Next, the  inner loop has  an assumed vector dependence.  Make sure
+   that this loop gets vectorized by inserting the appropriate pragma.
+   
+   Compile with  optimization report to  check that the inner  loop is
+   vectorized.  Then run  the code  to see  if you  get  a performance
+   improvement.
+ 
+4. Optional: Improve L1 cache traffic by implementing tiling. For more
+   information  refer  to  a   Colfax  Research  paper  which  can  be
+   downloaded for free at xeonphi.com/papers/lu
+
+
+

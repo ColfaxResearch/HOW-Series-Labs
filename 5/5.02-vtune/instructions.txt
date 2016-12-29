@@ -1,0 +1,24 @@
+In this exercise, we will look at how to use VTunes. For step-by-step guide 
+with pictures refer to the Text.
+
+1. Create a project for host execution. Use the run-on-host.sh script
+   instead of the binary executable, app-CPU. Using a bash script makes
+   it easier to set environment variables. (However, it is possible to do
+   this using app-CPU and setting the appropriate parameters in project
+   properties).
+
+   Profile the application using General Exploration. Then explore the 
+   result.  
+
+   Optional: Change the OMP_SCHEDULE from static to guided in the
+             run-on-cpu.sh script, then profile the application again.
+	     We will be discussing scheduling in a later lab.
+
+2. Create a project for native execution. Again use run-on-mic.sh script.
+   Note that both the script and the executable must be in the same 
+   directory on the coprocessor. 
+   
+   Use VTune in the native mode to profile the native execution. 
+
+3. Create project for offload. Once again, use the provided script,
+   run-offload.sh. Profile the application, then study the result.  

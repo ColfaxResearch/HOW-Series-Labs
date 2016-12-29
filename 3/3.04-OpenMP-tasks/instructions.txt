@@ -1,0 +1,32 @@
+NOTE: this  lab follows the  discussion in  Section 3.2.4 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+In this step, you will learn how to implement parallel recursion using
+OpenMP.  The  provided source  code is  a recursive  implementation of
+numerical integration  of 1/sqrt(x)  with respect to  x from  x=0.0 to
+x=1.0  with the  midpoint  method. The  goal of  this  exercise is  to
+parallelize    recursive_integral()    using     the    OpenMP    task
+functionality. Before starting, compile and run this code to check its
+output.
+
+1.   Parallelize  recursive_count()   using  parallel  recursion  with
+   OpenMP. Run your application to check the result.
+
+   Hints:
+
+   - Remember that  "#pragma omp task"  must be inside a  "#pragma omp
+     parallel" region.
+
+   - Make sure that  only one thread makes the  original function call
+     by using "#pragma omp single" or "#pragma omp master".
+
+   - When parallelizing  the recursive function, only  create one task
+     to  reduce the  total number  of parallel  tasks.  Be  mindful of
+     which recursive call you create a new task for.
+
+   - Be careful with "child_integral". The  default behavior in a "omp
+     task" region is to make a private copy.
+
+   

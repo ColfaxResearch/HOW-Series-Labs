@@ -1,0 +1,12 @@
+For best results with array copy:
+
+- On the host, try
+       OMP_NUM_THREADS=<N>
+       KMP_AFFINITY=scatter
+  That works for the host, but propagates OMP_NUM_THREADS
+  to the coprocessor, which is undesirable. To avoid, set 
+       MIC_ENV_PREFIX=O
+  and set 
+       O_KMP_PLACE_THREADS=<N>C,4t
+  where <N> is the number of physical cores.
+

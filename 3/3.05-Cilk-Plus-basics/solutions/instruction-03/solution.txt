@@ -1,0 +1,8 @@
+To run the application with 10 threads:
+
+[vega@lyra 3.5-Cilk-Plus-basics]$ export CILK_NWORKERS=10
+[vega@lyra 3.5-Cilk-Plus-basics]$ ./runme
+
+//// ... output ... ////
+
+[vega@lyra 3.5-Cilk-Plus-basics]$ unset CILK_NWORKERS

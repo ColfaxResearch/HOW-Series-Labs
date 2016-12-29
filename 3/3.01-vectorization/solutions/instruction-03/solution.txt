@@ -1,0 +1,8 @@
+The case of my_scalar_add();
+
+    The compiler does  not know if the  my_scalar_add() is safe
+    to  vectorize, because  the contents  of the  function may  not be
+    vectorizable.    For   example,    the   function    may   contain
+    non-thread-safe functions. Thus  the  compiler  takes  a defensive
+    stance and does not implement vectorization.
+

@@ -1,0 +1,24 @@
+NOTE: this  lab follows the  discussion in  Section 2.1.5 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors", second  edition (2015).   The book  can be  obtained at
+xeonphi.com/book
+
+In this step  we look at how to asynchronously  offload code execution
+to Intel Xeon  Phi coprocessors, and run something on  the host at the
+same time. The  code simply multiplies a  matrix A by vector  b on the
+coprocessor and on the host, the result in vectors c_target and c_host
+compared after the synchronization.
+
+1.  Insert a  pragma to  offload the  calculation of  c_target to  the
+   coprocessor
+
+2.  Modify the  pragma to  retain the  memory buffer  and the  data in
+   matrix A on the coprocessor
+
+3.  Modify the  pragma so  that the  code asynchronously  offloads the
+   calculation of c_target to the  coprocessor and, while this offload
+   is running, computes c_host on the host.
+
+4.  Insert a  pragma  to wait  for the  completion  of offload  before
+   verifying results.
+

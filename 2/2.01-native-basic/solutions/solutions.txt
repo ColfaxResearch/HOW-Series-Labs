@@ -1,0 +1,91 @@
+1)
+
+[vega@lyra 2.1-native]$ icpc hello.cc -o hello.XEON
+[vega@lyra 2.1-native]$ ./hello.XEON 
+Hello world! I have 48 logical cores.
+
+2)
+
+[vega@lyra 2.1-native]$ icpc -mmic hello.cc -o hello.MIC
+[vega@lyra 2.1-native]$ scp hello.MIC mic0:~/
+hello.MIC        100%   11KB 10.6KB/s   00:00
+[vega@lyra 2.1-native]$ ssh mic0 ~/hello.MIC
+Hello world! I have 244 logical cores.
+
+3)
+
+[vega@lyra 2.1-native]$ micnativeloadex hello.MIC
+Hello world! I have 244 logical cores.
+
+4)
+
+[vega@lyra 2.1-native]$ icpc -mmic -qopenmp hello.cc -o hello-openmp.MIC
+[vega@lyra 2.1-native]$ scp hello-openmp.MIC mic0:~/
+hello-openmp.MIC                              100%   11KB  11.3KB/s   00:00    
+[vega@lyra 2.1-native]$ ssh mic0 ~/hello-openmp.MIC
+/home/vega/hello-openmp.MIC: error while loading shared libraries:
+libiomp5.so: cannot open shared object file: No such file or directory
+
+[vega@lyra 2.1-native]$ ssh mic0 ldd ~/hello-openmp.MIC
+	linux-vdso.so.1 =>  (0x00007fff639ff000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007f52f82bb000)
+	libiomp5.so => not found
+	libstdc++.so.6 => /usr/lib64/libstdc++.so.6 (0x00007f52f7fc1000)
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f52f7daf000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f52f7b92000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f52f783a000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x00007f52f7636000)
+	/lib64/ld-linux-k1om.so.2 (0x00007f52f84ea000)
+
+[vega@lyra 2.1-native]$ locate libiomp5.so
+/opt/intel/composer_xe_2015.*/compiler/lib/ia32/libiomp5.so
+/opt/intel/composer_xe_2015.*/compiler/lib/intel64/libiomp5.so
+/opt/intel/composer_xe_2015.*/compiler/lib/mic/libiomp5.so
+
+[vega@lyra 2.1-native]$ sudo scp /opt/intel/composer_xe_2015.*/compiler/lib/mic/libiomp5.so mic0:/lib64
+libiomp5.so                                   100% 1249KB   1.2MB/s   00:00
+
+[vega@lyra 2.1-native]$ ssh mic0 ~/hello-openmp.MIC
+Hello world! I have 244 logical cores.
+
+5)
+
+[vega@lyra 2.1-native]$ sudo ssh mic0 rm /lib64/libiomp5.so
+
+[vega@lyra 2.1-native]$ micnativeloadex hello-openmp.MIC
+The remote process indicated that the following libraries could not be
+loaded:	libiomp5.so 
+Error creating remote process, at least one library dependency is missing.
+Please check the list of dependencies below to see which
+one is missing and update the SINK_LD_LIBRARY_PATH
+environment variable to include the missing library.
+
+
+Dependency information for hello-openmp.MIC
+
+	Full path was resolved as 
+	/home/vega/labs/2/2.1-native/hello-openmp.MIC
+
+	Binary was built for Intel(R) Xeon Phi(TM) Coprocessor
+	(codename: Knights Corner) architecture
+
+	SINK_LD_LIBRARY_PATH = 
+
+	Dependencies Found:
+		(none found)
+
+	Dependencies Not Found Locally (but may exist already on the
+coprocessor):
+		libm.so.6
+		libiomp5.so
+		libstdc++.so.6
+		libgcc_s.so.1
+		libpthread.so.0
+		libc.so.6
+		libdl.so.2
+
+[vega@lyra 2.1-native]$ export SINK_LD_LIBRARY_PATH=$MIC_LD_LIBRARY_PATH
+
+[vega@lyra 2.1-native]$ micnativeloadex hello-openmp.MIC
+Hello world! I have 244 logical cores.
+

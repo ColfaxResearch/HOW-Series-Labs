@@ -1,0 +1,33 @@
+NOTE: this  lab follows the  discussion in  Section 3.3.1 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+In this step you will learn the basics of Cilk Plus.
+
+1. Modify the initialization of  total_workers so that the first print
+   statement  prints   the  correct  value  of   number  of  available
+   workers.  Then  parallelize the  code  segment  that prints  "Hello
+   world" and modify  the initialization of worker_id so  that the the
+   code prints the actual worker numbers.
+
+   Remember to add the appropriate header file.
+
+2. Parallelize the "Hello world" print statement  using "_Cilk_for" to
+   print "Hello world" as many times as there are workers.
+
+   Note that only one worker prints  the "Hello World".  Cilk Plus has
+   an internal  scheduler that  distributes work at  runtime.  Because
+   printf  is a  small  workload, Cilk  Plus runs  most,  if not  all,
+   iterations in one worker.
+
+   Add  some workload,  or  insert usleep()  from  <unistd.h> to  each
+   iteration  so  that   every  worker  is  utilized,   then  run  the
+   application.   Be sure  to  use  the result  of  the workload  (for
+   example, print  it) so  that it  is  not removed  through dead-code
+   elimination.
+
+3. Modify the appropriate environment  variable to run the application
+   with different numbers of workers.
+
+LocalWords:  cilk

@@ -1,0 +1,42 @@
+NOTE: this  lab follows the discussion  in Section 4.5.2 and  4.5.3 in
+the book  "Parallel Programming and  Optimization with Intel  Xeon Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+In this exercize, you will learn how to implement tiling to improve
+cache traffic. The provided source code is a simple matrix vector 
+multiplication application. Matrix A is multiplied by the vector b
+and the result is stored in vector c. By default, multiply() function
+is run 10 times, and the average of the latter 7 iterations are
+averaged.
+
+0. Study the code, then compile and run the application on both the
+   host and the coprocessor to get the baseline result.
+
+1. Implement tiling in "j". For simplicity assume that "n" is always 
+   a power of 2. Be sure to watch for race conditions.
+
+   Then compile and run the application both on the host and on the 
+   coprocessor to compare performance. Experiment with differet tile 
+   sizes (remember that tile size must be a power of 2, and less 
+   than n). The optimal tile sizes may be different for the two
+   systems.
+
+2. Depending on the size of the j-Tile in the previous step, the
+   outer-most loop may not provide enough parallelism to occupy
+   all threads. We can address this issue by implementing tiling
+   in i, and using loop collapse. 
+   Implement tiling in "i". Assume that "m" is always a power of 2. 
+   Then collapse the outer two loops using the collapse(2) clause for 
+   #pragma omp parallel for.
+
+   Compile and run the code on both the corpocessor and the host and 
+   see if you get a performance improvement. Experiment  with differet 
+   tile sizes (remember that tile size must be a power of 2, and less 
+   than m and n for i and j). 
+
+3. Implement a recursive algorithm that, at each step,
+   splits the region over which to run the calculation either
+   in the i- or in the j-direction, until the sub-set of the problem
+   is small enough. Use the OpenMP task functionality
+   to parallelize the recursive algorithm.

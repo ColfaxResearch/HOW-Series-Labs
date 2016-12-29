@@ -1,0 +1,23 @@
+NOTE: this  lab follows the  discussion in  Section 5.1 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+This exercise demonstrates how to use MKL in the automatic offload,
+compiler assisted offload and native modes.
+
+1. Compile and run the application as a host executable.
+   Test its performance and then enable automatic offload by setting
+   the environment variable MKL_MIC_ENABLE=1.
+   Optimize performance of the application using environment variables
+   for thread count and affinity control as described in lab 
+   4/4.07-threading-affinity/part-1-compute/
+
+2. Compile the application as a coprocessor executable.
+   Test and optimize its performance using environment variables
+   as in the previous step.
+
+3. Add the necessary pragmas to the code to explicitly
+   offload the call to the function DGEMM to an Intel Xeon Phi coprocessor
+
+

@@ -1,0 +1,19 @@
+NOTE: this  lab follows the  discussion in  Section 2.1.5 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors", second  edition (2015).   The book  can be  obtained at
+xeonphi.com/book
+
+In this step we look at how to do native execution through MPI. Do not
+worry if  you are not  familiar with MPI; we  will cover the  topic in
+more depth in later labs. Just note the <mpi.h> header file, and learn
+how to run MPI processes.
+
+1.  Compile the  code with  mpiicpc for  the host,  then run  it using
+   mpirun on the host.
+
+2. Compile the code with mpiicpc for the MIC architecture, then run it
+   using mpirun on the Xeon Phi coprocessor.
+
+3. Run the MPI process on  the host and all the available coprocessors
+   using mpirun.
+

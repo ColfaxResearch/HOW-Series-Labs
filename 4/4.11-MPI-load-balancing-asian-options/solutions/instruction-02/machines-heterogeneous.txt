@@ -1,0 +1,4 @@
+localhost:1
+localhost:2
+mic0:1
+mic1:1

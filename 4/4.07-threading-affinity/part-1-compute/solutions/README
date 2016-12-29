@@ -1,0 +1,14 @@
+For best results with DGEMM:
+
+- On the host, try
+       OMP_NUM_THREADS=<N>
+       KMP_AFFINITY=compact,1,0 (if hyper-threading is enabled)
+       KMP_AFFINITY=compact     (if hyper-threading is disabled)
+  where <N> is the number of physical cores on the CPU or
+  the number of logical cores (physical cores times 2).
+
+- On the coprocessor, try
+       KMP_PLACE_THREADS=<N>C,4t
+       KMP_AFFINITY=compact
+  where <N> is the number of physical cores on the coprocessor.
+

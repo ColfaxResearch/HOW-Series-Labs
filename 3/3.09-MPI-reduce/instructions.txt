@@ -1,0 +1,36 @@
+NOTE: this  lab follows the  discussion in  Section 3.4.5 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+This code  numerically integrates the function  1/sqrt(x) with respect
+to x from x=0.0 to x=1.0 using  the midpoint method.  In this step you
+will parallelize this application  across multiple compute nodes using
+MPI.   In  the current  implementation,  each  process integrates  the
+function over  the entire  interval (i.e.  each  process does  all the
+work).  We  want to modify  the code so that  each process does  a its
+respective share of the iterations.
+
+1. First, change the  loop that runs in i from 0 to  nSteps so that it
+   runs from a new lower bound iMin to a new upper bound iMax.
+
+   Then  Compute iMin  and  iMax  for each  rank  using the  following
+   expressions:
+
+       iMin = long((rank ) * double(nSteps)/double(worldSize));
+
+       iMax = long((rank+1) * double(nSteps)/double(worldSize));
+
+   Verify analytically that this indeed partitions the iteration space
+   more or less evenly between all MPI processes
+
+   Run the  MPI application with  several processes to check  that the
+   printed value is indeed the partial integral.
+
+2. In order to compute the  sum of partial integrals, use the function
+   MPI_Reduce. It will be convenient  to introduce a new variable that
+   serves as  the receive buffer  in MPI_Reduce. Direct the  result of
+   the reduction to rank 0.
+
+   Modify output so that only rank  0 prints, and it prints the final,
+   correct value of the integral.

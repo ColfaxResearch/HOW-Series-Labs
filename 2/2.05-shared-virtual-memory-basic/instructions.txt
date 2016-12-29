@@ -1,0 +1,59 @@
+NOTE:  this lab  follows the  discussion in  Section 2.3.1,  2.3.2 and
+2.3.6 in  the book "Parallel  Programming and Optimization  with Intel
+Xeon  Phi  Coprocessors", second  edition  (2015).   The book  can  be
+obtained at xeonphi.com/book
+
+In this step  we look at how  to offload code execution  to Intel Xeon
+Phi coprocessors using the shared virtual memory model.  The code is a
+slight variation  of the source  code in lab  2.03.  Here matrix  A is
+multiplied by vector  b, and the elements in the  resulting vector are
+summed up  and stored  in variable sum.   The multiplication  work has
+been moved into a function.
+
+1a.  We  want  to  offload the  function  multiply_then_add()  to  the
+   coprocessors.  To  do that, modify  the code to declare  as shared:
+   the variable  sum, arrays  A and  b, and the  body of  the function
+   itself.  Note that n and m  are preprocessor macros, so they do not
+   need to be shared.
+
+1b. For sum, b and the function, you only need to add one qualifier to
+   make them sharable.  For sharing A, you will need  to use a special
+   version of malloc to allocate memory.
+
+1c. To perform offload, put _Cilk_offload before the function call
+
+1d. Also add block of code  to multiply_then_add that uses the #ifndef
+    __MIC__ statement  to print  an error message  if the  offload was
+    unsuccessful.
+
+   Compile and run  the application and check your  result. Verify the
+   offload with OFFLOAD_REPORT=3
+
+   (if your system has only  one Intel Xeon Phi coprocesssor, skip the
+   rest of the instructions)
+
+2a.  Now offload the same function to all available coprocessors. Make
+   sure that each coprocessor gets work by using targeted offload.
+
+2b.  Add  a print  statement  in  multiply_then_add() and  report  the
+   coprocessor  number  the function  is  running  on. Note  that  the
+   correct   result  should   now  be   m*(number_of_devices)  because
+   multiply_then_add()    is     carried    out    (number_of_devices)
+   times. (i.e. with 4 MICs the correct result is 4*m)
+
+   Compile and run the code and confirm your result.
+
+3a. Convert these offloads to asynchronous offloads with _Cilk_spawn
+
+3b.  Insert _Cilk_sync  at the  appropriate location  to wait  for the
+completion of offloads
+
+   Compile and run the application.  It will complete faster, however,
+   the result will be wrong. This is because multiple coprocessors try
+   to modify "sum" at the same  time.  Situations like this are called
+   "race  condition", and  will  be  covered more  in  depth in  later
+   chapters and labs.
+
+4. Optional: fix race condition by  using an array instead of a scalar
+   for "sum", with array elements being the results returned from each
+   respective coprocessor.

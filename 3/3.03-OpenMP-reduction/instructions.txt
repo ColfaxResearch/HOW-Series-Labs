@@ -1,0 +1,80 @@
+NOTE: this  lab follows the  discussion in  Section 3.2.7 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+integral.cc numerically integrates the function 1/sqrt(x) with respect
+to x from x=0.0 to x=1.0 using  the midpoint method.  In this step you
+will  parallelize  this  application   using  OpenMP  and  avoid  race
+conditions using reduction.
+
+1. First, compile and run the  application to confirm the result. (you
+   may  need to  adjust the  nSteps variable  for this  application to
+   complete in  a reasonable  amount of time).   Now use  "#pragma omp
+   parallel  for"   to  parallelize  the   loop,  and  then   run  the
+   application.
+
+   You should  see that the  application runs faster but  produces the
+   wrong result. Can you explain why?
+   
+   Run the same  application with 1 thread by  setting the appropriate
+   environment variable to 1. You  should now see that the application
+   produces the correct result. This is a good method for testing your
+   application  for   race  conditions.   Make  sure   you  unset  the
+   environment variable afterwards, otherwise all subsequent runs with
+   any application in the same terminal session will be serialized.
+   
+2. To resolve this type of race conditions, "#pragma omp parallel" has
+   the  clause  "reduction".  Add  this  clause  with the  appropriate
+   arguments to resolve the race  condition. Run your application with
+   multiple threads and check that your result is correct.
+
+3.   To see  how  reduction  works behind  the  scenes,  let's try  to
+   implement it ourselves. Reduction works as follows; each thread has
+   a private copy the variable to be reduced ("integral" in this case)
+   that is  used as  a buffer  to store  intermediate result  (in this
+   case,  partial sum).   Then at  the end  the private  variables are
+   "reduced", i.e.   combined, in a  thread-safe manner into  a shared
+   variable.
+
+   To implement this, first separate the #pragma omp parallel for into
+   "#pragma  omp parallel"  with  "#pragma omp  for"  inside. This  is
+   because the calculation and the reduction must be done in the scope
+   of the same parallel region.
+
+   Now let's create the variable "partial_sum" that is private to each
+   thread.  The  easiest solution  is to simply  declare "partial_sum"
+   inside the scope  of "omp parallel" before the  "omp for". However,
+   we can  also implement an  alternative method to  illustrate syntax
+   that works when all variables are  declared at the beginning of the
+   function (e.g., in Fortran).
+
+   First, declare "partial_sum"  and initialize it to  0.0 outside the
+   parallel region. To make variables from outside the parallel region
+   private  to  each  thread,   "#pragma  omp  parallel"  has  clauses
+   "private" and "firstprivate". In  our case, "firtprivate" is needed
+   in order to  initialize the private copies of the  variable in each
+   thread to the value assigned before the parallel region.
+
+   Change the  body of the  for-loop marked  with "pragma omp  for" so
+   that "partial_sum" is the variable modified inside the for loop.
+
+
+   Finally,  let's   reduce  (i.e.,   add  together)  the   values  of
+   "partial_sum" in each thread into  "integral".  Make sure to insert
+   "#pragma omp atomic"  or "#pragma omp critical"  in the appropriate
+   line of the code to ensure  this final step is serialized.  Compile
+   and run to check that the result is correct.
+
+   Note:  For  this particular  application,  there  is no  observable
+         difference in  performance between  "#pragma omp  atomic" and
+         "#pragma   omp  critical",   however,  they   function  quite
+         differently.   "atomic" can  only be  applied to  some scalar
+         operations, and it ensures that  the memory addresses used in
+         the  operation are  updated  atomically.  "critical"  ensures
+         that all  operations in  its scope,  regardless of  type, are
+         carried out  by only one  thread at  a time. In  other words,
+         atomic is a  lock on the data, whereas critical  is a lock on
+         the instruction.   If the  operation supports "atomic"  it is
+         advisable  to use  "atomic" instead  of "critical"  to attain
+         greater performance.

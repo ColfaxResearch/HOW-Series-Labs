@@ -1,0 +1,47 @@
+NOTE: this  lab follows the discussion  in Section 2.3.4 and  2.1.5 in
+the book  "Parallel Programming and  Optimization with Intel  Xeon Phi
+Coprocessors", second  edition (2015).   The book  can be  obtained at
+xeonphi.com/book
+
+In the virtual shared memory model  you can share complex objects with
+the coprocessor.  In  this step you will learn how  to define a class,
+which will  be shared  between the  host and  coprocessor, and  how to
+offload a class object using the virtual-shared memory model.
+
+0. Quickly  study the code,  then compile and  run to see  the correct
+result.
+
+1. Let's start by sharing the global array "who" with the coprocessor.
+
+   Add the _Cilk_shared qualifier in appropriate places so that we can
+   offload the  function call  PrintString() to the  coprocessor using
+   the syntax "_Cilk_offload  PrintString()".  Call PrintString() once
+   on  the  host  (i.e.,  simply  "PrintString()")  and  once  on  the
+   coprocessor (i.e., "_Cilk_offload PrintString()").
+
+2. Now let's modify the class  Person and the object "someone" so that
+   the method Set()  may be offloaded to the  coprocessor using syntax
+   "_Cilk_offload someone.Set(who)".   Remember that it is  illegal to
+   declare  class members  as _Cilk_shared;  instead, the  whole class
+   must be declared as shared.
+
+   In addition  to modifying  the declaration of  the class,  you will
+   have to replace malloc() with _Offload_shared_malloc.
+
+3. Add a check using #ifdef __MIC__ to the body of Set() to see if the
+   function was indeed offloaded.  Run the application and verify yout
+   result.
+
+4. Replace  the declaration of "someone"  so that instead of  a global
+   instance,  it   becomes  a  global  pointer-based   object:  Person
+   _Cilk_shared  *someone;  In  order  to create  a  new  instance  of
+   "someone" in main(), you will have  to use the placement version of
+   operator  "new"  available  in  header file  <new>.  The  placement
+   version allows  you to  call a special  memory allocator  first and
+   then call "new"  specifying the pointer to the memory  region to be
+   used  for  the  object.   The  syntax is:  ptr  =  new(  address  )
+   ClassName;
+
+   Dynamically allocate space  for person using _Offload_shared_malloc
+   and then  create an instance  of object Person using  the placement
+   version of operator new.

@@ -1,0 +1,31 @@
+NOTE: this  lab follows the  various discussions  in Chapter 3  in the
+book  "Parallel  Programming  and  Optimization with  Intel  Xeon  Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+This is  an open-ended problem. The  provided source code is  a simple
+serial  matrix-matrix   multiplication.   Modify  the  code   to  take
+advantage of all three layers of parallelism.
+
+Some notes:
+
+  Data  parallelism;  Be sure  to  check  the optimization  report  to
+                      confirm  vectorization.  (Do  not  worry if  the
+                      optimization report  includes the  comment "Loop
+                      Interchange". This  concept will be  explored in
+                      later labs)
+
+  Thread parallelism; Use  an OpenMP pragma or Cilk  Plus construct to
+                      parallelize   one   of    the   loops   in   the
+                      matrix-matrix multiplication.  Make  sure you do
+                      not  have  race conditions.   Theoretically  you
+                      could  parallelize  any  of  the  nested  loops.
+                      However,  typically  it  is  more  efficient  to
+                      parallelize outer-most loop.
+
+  Process parallelism;  Use MPI  or offload  model to  distribute work
+                      between the  coprocessor and the CPU.   Only the
+                      CPU should  initialize matrices A, B  and C, and
+                      the other  processes should receive a  copy of B
+                      and a portion of A and return a portion of C.
+

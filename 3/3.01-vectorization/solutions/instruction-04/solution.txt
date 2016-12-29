@@ -1,0 +1,11 @@
+
+The case of my_vector_add();
+
+    The compiler does not know if the input array pointers "a" and "b"
+    map  overlapping  memory regions.  For example, a  and b  could be
+    pointing    to    addresses    that     are    offset    by    one
+    (i.e. a[i]=[i]+a[i+1]).  In such cases vectorization  will lead to
+    incorrect results.  Thus compiler  makes two  implementations; one
+    with vector instructions  and one without.  Then at  run time, the
+    application has  a check  to see  if the  memory regions  from the
+    input arrays overlap, and choses the implementation accordingly.

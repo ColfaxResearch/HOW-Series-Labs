@@ -1,0 +1,71 @@
+NOTE: this lab follows the discussion in Section 2.2.1 to 2.2.4 in the
+book  "Parallel  Programming  and  Optimization with  Intel  Xeon  Phi
+Coprocessors", second  edition (2015).   The book  can be  obtained at
+xeonphi.com/book
+
+In this step  we look at how  to offload code execution  to Intel Xeon
+Phi coprocessors. The  code simply multiplies a matrix A  by vector b,
+the result is stored in vector c.
+
+1. Compile the code for execution on the host, then run it to check if
+   the result is correct.
+
+2.  Now add  offload pragma  to  the code  to calculate  matrix-vector
+   multiplication  on the  Xeon  Phi coprocessor.   Insert the  pragma
+   inside of the loop in "iter". There will be maxIter offloads to the
+   Intel  Xeon Phi  coprocessor.  You  can try  to offload  a "printf"
+   statement to the coprocessor first.
+
+   If you see the following error message:
+
+   matrix.cpp(17): error: pointer variable  "A" in this offload region
+   must be specified in an in/out/inout/nocopy clause
+
+   fix it by using: "in(A:length(n*m))"  clause, which is required for
+   dynamically allocated  arrays. Other local variables/arrays  on the
+   stack will be copied automatically, if not specified otherwise.
+
+3. If you have X11-window forwarding  enabled, or you are running this
+   code in a  graphical desktop environment, use  micsmc-gui to verify
+   that indeed Xeon  Phi coprocessor is doing  the calculations. Note:
+   switch to load per core  view.  Increase the amount of calculations
+   if needed.
+
+4.  Add  'optional' clause  to  offload  pragma. Set  the  environment
+   variable OFFLOAD_DEVICES=none. This  variable controls which device
+   should be used for the offload. Run  the code and verify that it is
+   now doing multiplication of the CPU.
+
+5.  Switch back  to  OFFLOAD_DEVICES=0. Set  the environment  variable
+   OFFLOAD_REPORT=n  for   n=1,  2   or  3  for   different  verbosity
+   levels.  Check how  values  in the  report depend  on  size of  the
+   problem (change n and m values).
+
+6. By using:
+
+#ifdef __MIC__  printf("Code is running on  the MIC architecture.\n");
+    #else printf("Code is running on the host.\n"); #endif
+
+   verify   that   the   application   indeed  is   running   on   the
+   coprocessor. Don't forget  to put this construct in  the code block
+   bounded by {...} brackets following the offload pragma.
+
+7. Move matrix-vector multiplication into a separate function. Offload
+   this function call to the coprocessor.
+
+8.  Declare  constant   integer  n,  and  vector  b[:]   as  a  global
+variable/array.
+
+9. Use offload_attribute(push/pop) for function body and global vector
+b[:].
+
+10.Memory  retention:  Check  the   amount  of  transfered  data  with
+   OFFLOAD_REPORT=2.
+   
+   Now use the offload_transfer pragma to  pass matrix A values to the
+   coprocessor  and tell  the  compiler  to leave  it  in the  memory,
+   because it  will be used  maxIter times  for each iteration  of the
+   loop  in  "iter".    Explicitly  specify  with  in/out/inout/nocopy
+   clauses  what should  be done  with the  data. Verify  it with  the
+   offload report.
+

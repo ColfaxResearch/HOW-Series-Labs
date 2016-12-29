@@ -1,0 +1,11 @@
+For best results with DFFT:
+
+- On the host, try
+       OMP_NUM_THREADS=1
+       NUMBER_OF_PROCESSES=<N>
+       KMP_AFFINITY=compact,0,$OCCUPIED_THREADS
+  where <N> is the number of logical physical cores on the CPU.
+
+- On the coprocessor, you will not be able to run ~60 single-threaded processes 
+  due to memory limitation. Try to find the maximum number of processes 
+  and compute the corresponding number of threads per process.

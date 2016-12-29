@@ -1,0 +1,62 @@
+NOTE: this  lab follows the discussion  in Section 3.1.6 to  3.1.10 in
+the book  "Parallel Programming and  Optimization with Intel  Xeon Phi
+Coprocessors", second  edition (2015).   The book  can be  obtained at
+xeonphi.com/book
+
+In   this  exercise,   you  will   learn  the   basics  of   automatic
+vectorization.
+
+0.  One useful  tool that  Intel C/C++  compiler offers  for automatic
+   vectorization is  the opimization report. The  full report contains
+   information about optimizations,  including vectorization, that the
+   compiler  applied.  Study  the OPTFLAGS  variable in  the Makefile,
+   then compile using "make" to produce the optimization report.  Then
+   in the  optimization report for "vectorization.cc",  check that the
+   loop labeled "addition" is vectorized.
+
+1. Insert  the appropriate pragma in  front of the "addition"  loop to
+   disable vectorization  for that  loop. Use the  optimization report
+   again to check that the loop was in fact not vectorized.
+
+2.  Experiment  with  other  functions to  see  which  functions  have
+   vectorization support.  For example,  add an "if"  statement inside
+   the loop to introduce masked  operations.  Also compile for the MIC
+   architecture  to   see  the  vectorization  support   for  the  MIC
+   architecture.
+
+3. Check the loop containing my_scalar_add() in "vectorization.optrpt"
+   to see if they was vectorized.
+
+   Vectorize  the loop  containing  my_scalar_add()  by modifying  the
+   function signature  of my_scalar_add()  in "worker.cc".   Check the
+   optimization report to confirm the results.
+
+   Functions   like  my_scalar_add(),   which   can  be   used  in   a
+   data-parallel   manner,  are   collectively  called   "SIMD-Enabled
+   Functions".
+
+4. Check the  loop in my_vector_add() in "worker.optrpt" to  see if it
+   was vectorized.
+
+   Note:  For my_vector_add(),  you will  see that  the compiler  uses
+   	 "Multiversioning"  to  produce  two implementations  for  the
+   	 loop. In such  cases compiler inserts a run-time  test in the
+   	 executable  to  determine  which  implementation  to  use  at
+   	 run-time.
+
+   Can  you  explain reasoning  behind  why  the compiler  implemented
+   multiversioning?
+
+   Prevent  the compiler from  using Multiversioning by  using #pragma
+   ivdep.  Check the optimization report to confirm the results.
+
+5. #pragma ivdep  is  specific for  a  loop,  so  any subsequent  loop
+   without this pragma may not be  vectorized. To declare that the two
+   inout arrays are unique and  do not overlap, the restrict qualifier
+   can be used.
+   
+   Prevent  the   compiler  from   using  Multiversioning   by  adding
+   "restrict" to the function signature of my_vector_add().  Note that
+   you will need to add an additional flag to the Makefile.  Check the
+   optimization report to confirm the results.
+

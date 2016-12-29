@@ -1,0 +1,55 @@
+NOTE: this  lab follows the  discussion in  Section 4.3.2 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+In this lab you will see the effect ot implementing unit-stride access
+to data on the performance of vectorized calculations.
+
+
+0.  First, compile  and run  the application  on the  host and  on the
+coprocessor  using  "make  run-cpu"  nd "make  run-mic".  Record  this
+baseline performance.
+
+
+
+1. Study the  for-loop in CalculateElectricPotential(). The vectorizer
+will pack 8 (on CPU) or 16 (on Xeon Phi) consecutive iterations into a
+single vector operation. How many  cache lines will have to be touched
+in one vector iteration? (consider the implementation of the structure
+Charge). What  is the stride  (in bytes) with which  the x-coordinates
+will have to be accessed in each vector iteration?
+
+Change  the layout  of the  data  so that  particles are  stored in  a
+structure  of arrays  as shown  below. You  will have  to  change code
+across  main.cc in  order to  make this  work. This  layout guarantees
+unit-stride
+
+   struct Charge_Distribution { 
+      const  int m;  //
+      float *x;  // Array  of x-coordinates  of particles
+      float *y;  //  ...y-coordinates...   
+      float *z; //  ...z-coordinates...
+      float *q;  //  ...charges
+   }
+
+Compile and run the new application and compare the performance to the
+baseline.
+
+Study  the for-loop in  CalculateElectricPotential() and  estimate how
+many  cache lines  have to  be touched  in one  vector  iteration. You
+should  observe  considerable   reduction  compared  to  the  original
+case. What is the stride  (in bytes) with which the x-coordinates will
+have to  be accessed in each  vector iteration? It should  be equal to
+the size of the data type "float".
+
+
+
+2. Study the effect of  using the compiler argument "-fp-model fast=2"
+in  this  code.  Does the  performance  change  on  the host?  On  the
+coprocessor?
+
+Try  to compare  the  assembly produced  with  and without  "-fp-model
+fast=2" to see what changed  in the code. To produce assembly listing,
+compile with "-S -o assembly_file_name.txt"
+

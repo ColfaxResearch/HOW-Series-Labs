@@ -1,0 +1,45 @@
+NOTE: this  lab follows the  discussion in  Section 4.4.4 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+This  lab demonstrates dealing  with insufficient  parallelism through
+strip-mining and loop collapse.
+
+0. Study the code in worker.cc and also take a look at the values of m
+   and n in main.cc What do you think will happen in the parallel loop
+   in worker.cc?   Benchmark the  baseline implementation on  the host
+   ("make   run-cpu")  and  on   the  coprocessor   ("make  run-mic").
+   Optionally,  analyze the  application in  VTune using  the Advanced
+   Hotspots analysis.   Specifically, take  a look at  the concurrency
+   histogram  and at the  timeline in  the "Hotspots"  viewpoint.  You
+   should detect load imbalance if your host has more than 4 threads.
+
+1. As  you could  see in  step 0, the  problem is  that there  are not
+   enough  iterations  in  the  loop parallelized  with  "#pragma  omp
+   parallel  for".  Let's attempt  to  improve  on  this situation  by
+   parallelizing the inner loop,  which has millions of iterations. Do
+   not forget to  resolve race conditions using reduction  when you do
+   that.
+ 
+   Benchmark the performance of this implementation and compare to the
+   baseline.
+
+2. Let's  try to improve  on the solution  in step 1  by parallelizing
+   both  the i-  and the  j-loop.  You  can do  this using  the clause
+   "collapse(2)"  in  "#pragma omp  parallel  for".   To resolve  race
+   conditions, you  may have  to introduce a  thread-private container
+   that contains partial sums for the resulting array "s".
+
+   Benchmark the  application. Prepare to be  disappointed.  Study the
+   vectorization report to understand what happened.
+
+3. Finally, let's  tweak the implementation from step  2. The compiler
+   is unable  to vectorize  the j-loop when  it is collapsed  with the
+   i-loop.  To help the compiler, strip-mine the j-loop. Vectorization
+   will be retained in the innermost loop. The outer two loops will be
+   collapsed.  You may  have to  do some  experimentation to  find the
+   optimal value of the strip size.
+
+   At  this point you  should see  the best  performance of  all three
+   optimization attempts.

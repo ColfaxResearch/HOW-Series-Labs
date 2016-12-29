@@ -1,0 +1,103 @@
+NOTE: this  lab is an  overview of various optimizations  discussed in
+Chapter  4 in  the book  "Parallel Programming  and Optimization  with
+Intel Xeon Phi  Coprocessors", second edition (2015). The  book can be
+obtained at xeonphi.com/book
+
+In this step we will look at  how to modernize a piece of code through
+an  example  application.   The  provided  source code  is  an  N-body
+simulation,   which   is  a   simulation   of   many  particles   that
+gravitationally or electrostatically  interacting with each other.  We
+keep track  of the position and  the velocity of each  particle in the
+structure "Particle". The simulation is discretized into timesteps. In
+each  timestep, first,  the  force  on each  particle  (stored in  the
+structure) is  calculated with  a direct all-to-all  algorithm (O(n^2)
+complexity). Next, the velocity of each particle is modified using the
+explicit  Euler method.  Finally  the positions  of the  particles are
+updated using the explicit Euler method.
+
+N-body simulations are used in astrophysics to model galaxy evolution,
+colliding  galaxies, dark  matter  distribution in  the Universe,  and
+planetary  systems.  They are  also used  in simulations  of molecular
+structures. Real astrophysical N-body simulations, targeted to systems
+with  billions  of  particles,   use  simplifications  to  reduce  the
+complexity of the method to O(n  log n). However, our toy model is the
+basis on which the more complex models are built.
+
+In  this   lab,  you  will   be  mostly  be  modifying   the  function
+MoveParticles().
+
+0. Study  the code, then  compile and run  the application to  get the
+   baseline performance. To run the application on the host,  use  the
+   command "make run-cpu" and for coprocessor, use "make run-mic".
+
+1. Apply strength reduction for the calculation of force (the j-loop).
+   You should be able to limit  the use of expensive operations to one
+   sqrtf()  and one  division,  with the  rest being  multiplications.
+   Also make sure to control the precision of constants and functions.
+
+   Compile and run the application to see if you got an improvement.
+
+2. Parallelize  MoveParticles() by  using OpenMP. Remember  that there
+   are  two loops  that  need to  be  parallelized. You  only need  to
+   parallelize the outer-most loop.
+
+   Also modify the print statement  in, which is hardwired to print "1
+   thread" (i.e., print the actual number of threads used).
+
+   Compile and run the application to see if you got an improvement.
+
+3.  In the current  implementation the  particle data  is stored  in a
+   Array of  Structures(AoS), namely a  structure of "ParticleTypes"s.
+   Although  this is  great  for readability  and  abstraction, it  is
+   sub-optimal for performance  because the coordinates of consecutive
+   particles  are  not  adjacent.  Thus  when the  positions  and  the
+   velocities are accessed in the  loop and vectorized, the data has a
+   non-unit stride access, which  hampers performance. Therefore it is
+   often beneficial  to instead implement a Structure  of Arrays (SoA)
+   instead, where a single structure holds coordinate arrays.
+
+   Implement     SoA      by     replacing     "ParticleType"     with
+   "ParticleSet". Particle set  should have 6 arrays of  size "n", one
+   for each dimension in the coordinates (x, y, z) and velocities (vx,
+   vy,  vz).  The i-th  element  of each  array  is  the cordinate  or
+   velocity  of  the  i-th  particle.   Be sure  to  also  modify  the
+   initialization in  main(), and modify  the access to the  arrays in
+   "MoveParticles()".   Compile   then  run  to  see  if   you  get  a
+   performance improvement.
+   
+4. Let's  analyze this application  in terms of  arithmetic intensity.
+   Currently,  the  vectorized   inner  j-loop  iterates  through  all
+   particles for  each i-th element.  Since the cache line  length and
+   the vector length are the  same, arithmetic intensity is simply the
+   number  of instructions in  the inner-most  loop. Not  counting the
+   reduction at the bottom, the  number of operations per iteration is
+   ~20, which is less than the ~30 that roofline model calls for.
+   
+   To fix this, we can use tiling to increase cache re-use.  By tiling
+   in "i" or "j" by Tile=16 (we  chose 16 because it is the cache line
+   length as  well as the vector  length), we can  increase the number
+   operations to  ~16*20=~320. This is more  than enough to  be in the
+   compute-bound region of the roofline mode.
+
+   Although the  loop can  be tiled in  "i" or  "j" (if we  allow loop
+   swap) it is more beneficial  to tile in "i" and therefore vectorize
+   in  "i". If  we  have "j"  as  the inner-most  loop each  iteration
+   requires  three reductions  of  the vector  register  (for Fx,  Fy,
+   Fz). This is costly as this not vectorizable. On the other hand, if
+   we  vectorize  in  "i"  with   tile  =  16,  it  does  not  require
+   reduction. Note though, that you  will need to create three buffers
+   of  length 16  where you  can store  Fx, Fy  and Fz  for  the "i"th
+   element.
+
+   Implement  tiling  in  "i".  then   compile  and  run  to  see  the
+   performance.
+
+5. Using MPI, parallelize the simulation across multiple processes (or
+   compute nodes).   To make  this work doable  in a short  time span,
+   keep  the entire  data  set  in each  process.   However, each  MPI
+   process  should  execute  only  a   portion  of  the  loop  in  the
+   MoveParticle()   function.   Try   to   minimize  the   amount   of
+   communication  between the nodes.   You may  find the  MPI function
+   MPI_Allgather() useful.  Compile and run the code to see if you get
+   a performance improvement.
+   

@@ -1,0 +1,65 @@
+NOTE: this  lab follows the  discussion in  Section 4.6.2 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+In  this exercise  we  will  be looking  at  how  to optimize  offload
+communications.  The  provided source code  is an offloaded  MKL dgemm
+(Matrix-Matrix  multiplication).  On  top  of  the  usual  performance
+report, the  code will also  benchmark the computation  performance on
+the MIC and the offload bandwidth.
+
+0.   Compile  then   run   the  application   to   get  the   baseline
+   performance.  You  should  see   very  poor  performance  for  both
+   computation and communication.  Then comment out the offload to see
+   the performance on the host as well.
+	  
+1.  Implement memory  buffer retention  by allocating  space for  each
+   matrix in  the coprocessor. This  should be  done once in  the very
+   beginning  inside main().  Make  sure that  the  allocated data  is
+   aligned properly by using the align() option in "in/out" clauses.
+
+   For this  step separate out  the communication from  computation by
+   using the  "#pragma offload_transfer"  to transfer matrix  data and
+   used  the  "#pragma  offload"  with  no data  transfer  to  do  the
+   computation.  This  will  give  us a  more  accurate  benchmark  on
+   communication  and computation  separately. Furthermore  separating
+   out communication from computation is useful for instruction 3.
+ 
+   Compile then  run the  application. You  should see  an improvement
+   both in bandwidth and performance.
+
+2.  Currently  data  region  for  each  matrix  is  allocated  on  the
+   coprocessor.  This is sub-optimal  because the initialization takes
+   a  long time,  and the  matrices take  up a  lot of  memory on  the
+   coprocessor. Since we  only operate on one matrix at  a time, it is
+   unnecessary to have data allocated for every matrix.
+
+   Instead of  allocating memory  for every matrix,  implement buffers
+   that can hold  one matrix (for A,  B and C) that is  reused for all
+   calculations.  You will need to use  the "into" option for the "in"
+   and "out" clauses in the "#pragma offload_transfer".
+
+   Compile the code and run it.
+
+3. Let's  take buffers one  step further. Currently  communication and
+   computation is  sequential. However, the communication  time can be
+   overlapped    with   the    computation   time    by   implementing
+   "double-buffering".  As the name suggests, in "double-buffer" model
+   there are two sets of buffers  allocated on the coprocessor. And as
+   one set is used for computation,  the data for the next computation
+   and the results from the  previous computation are transferred. For
+   applications where the offload  time is comparable with computation
+   time,  such  as  this  one,   this  can  theoretically  double  the
+   performance.
+
+   Implement  "double-buffer".  You  will  need  to  use  asynchronous
+   offload to  parallelize computation  and communication. Be  sure to
+   watch for exceptions  in the algorithm. (For example,  first set of
+   matrices  must  be  transferred  before any  computation  can  take
+   place.)  You  don not  need  to  take  separate benchmark  for  the
+   communication and computation for this step. (You should not do any
+   timing inside Calculate_dgemm here)
+
+   Compile and run the application.
+   

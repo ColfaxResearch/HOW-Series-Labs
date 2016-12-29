@@ -1,0 +1,14 @@
+NOTE: this  lab follows the  discussion in  Section 3.3.3 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+In this step, you will learn how to implement parallel recursion using
+Cilk  Plus. The  provided source  code implements  recursive numerical
+integration of the function 1/sqrt(x) with  respect to x from x=0.0 to
+x=1.0.  Your  task  is  to  parallelize  recursive_integral().  Before
+starting, compile and run this code to check its output.
+
+1. Parallelize recursive_integral() using parallel recursion with Cilk
+   Plus. You should only have to add two Cilk Plus keywords.  Run your
+   application to check the result.

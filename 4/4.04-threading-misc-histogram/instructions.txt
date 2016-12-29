@@ -1,0 +1,108 @@
+NOTE: this lab follows the discussion in Section 4.3.6 to 4.4.2 in the
+book  "Parallel  Programming  and  Optimization with  Intel  Xeon  Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+In  this lab  we will  look at  how to  modernize a  piece of  code by
+exposing  parallelism, using  compiler friendly  practices,  and cache
+traffic optimization.   The provide source code is  a simple histogram
+generator.  The  application  iterates  through the  array  "age"  and
+generates a  histogram that  contains the number  of people  with ages
+that fell  within each  age group (i.e.,  histogram bin). The  size of
+this bin is determined by the argument "group_width".
+
+0. Obtain baseline performance on the host ("make run-cpu") and on the
+   coprocessor   ("make   run-mic").   At   each  of   the   following
+   instructions, measure performance  on the host as well  as the Xeon
+   Phi coprocessor using native execution.
+
+1. Apply  strength reduction. There  is an expensive  operation inside
+   the loop  that in performed repeatedly.  It can be  replaced with a
+   less expensive operation.
+
+   Compile and run the application to see if you get an improvement.
+
+2. Now  let's try  to vectorize this  function. Unfortunately,  in its
+   current implementation the code  is unvectorizable because there is
+   random access  to the array  "hist". In situations like  these, you
+   can  still get  some of  the  benefit from  vectorization by  using
+   strip-mining and splitting the loop into two.
+
+   First, implement  strip-mining. The tile  size should be  the equal
+   to, or a  multiple of the vector length, which in  this case 16 (on
+   the MIC architecture). Keep in  in mind that you are not guaranteed
+   that the  n is  a multiple of  16. Thus  you will need  a remainder
+   loop.
+
+   Then  in the main  loop split  the inner  for-loop into  two loops;
+   array "age" should only appear  in the first loop, and array "hist"
+   should only appear in the second loop. You will also need to create
+   a new  array, let's call it  "index", with the length  equal to the
+   tile. Make sure that array "index" is aligned correctly.
+
+   In the first loop, the indices should be calculated and copied into
+   array "index". In the second  loop the array "index" should be used
+   to increment "hist".
+
+   Compile and run the application to see if you get an improvement.
+
+   Note: To  see how  this helps, consider  what happens in  the first
+         loop when application tries to go through 16 iterations. With
+         the previous implementation the application had to access the
+         cache 16  times and carry  out multiplication 16  times. With
+         the current implementation the application just needs to load
+         one  cache line  into a  vector  register and  carry out  one
+         vector multiplication.  Thus even  though the second  loop is
+         still not vectorized, we get a performance improvement.
+	 
+3. Now let us try to parallelize the code using OpenMP parallelize the
+   application.
+   
+   Remember  that there  are two  arrays you  write into,  "index" and
+   "hist". These  must be protected from race  conditions. Resolve the
+   race  condition  on  array  "index" making  it  thread-local.  Then
+   resolve  the  race condition  on  "hist"  by  inserting the  atomic
+   pragma.
+
+   Compile and run the application to see if you get an improvement.
+
+4. Synchronization through pragma  atomic, or, worse, pragma critical,
+   is very costly,  and should be avoided as much  as possible. We can
+   decrease the amount of  synchronization used for "hist" by creating
+   a thread-local  buffer, let's call  it "hist_priv", into  which the
+   histogram  is  initially  stored  by  each thread.  After  all  the
+   iterations each  "hist_priv" should  be combined into  "hist" (this
+   step still requires pragma atomic,  but it is used fewer times than
+   in the previous implementation).
+
+   Implement this thread-local buffer, then  compile and run to see if
+   you get a performance improvement.
+
+5. Let's try implementing "hist_priv" differently. Instead of having a
+   local scalar variable, create one "hist_global" array of size equal
+   to   the  number   of  threads   multiplied  by   the  size   of  a
+   histogram. Each  thread should access only a  subset of hist_global
+   array.    Implement  "global_hist",  then   compile  and   run  the
+   application.  You should see that performance actually drops.
+
+   The issue with this set-up is false sharing. To resolve it, we will
+   need to  pad the hist_global  so that no  two threads try  to write
+   into the same  cache line. Remember that cache  lines are 64-bytes;
+   "hist_private" will need to be  padded to at least 64/sizeof(int) =
+   16.  Compile and  run the  code  to see  if you  get a  performance
+   improvement.
+   
+   Try  different sizes  of padding  and  see how  the performance  is
+   affected.  On the  host you  should see  that, up  to a  point, the
+   performance  improves  with  larger  padding  sizes.  However,  the
+   performance should stay constant on the coprocessor.
+   
+6.  Finally  let's  use  proper  first-touch  memory  allocation.   In
+   "main.cc" insert an initialization for age (set every element to 0)
+   using #pragma  omp parallel  for. Compile the  code then run  it to
+   measure performance.
+
+   Note: This may or may  not improve performance depending on whether
+         your system has NUMA architecture or not.
+
+

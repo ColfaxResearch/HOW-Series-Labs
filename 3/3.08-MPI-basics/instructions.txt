@@ -1,0 +1,69 @@
+NOTE: this  lab follows the  discussion in  Section 3.4.2 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+In this  step you will learn  the basics of MPI.   The provided source
+code is  a simple MPI application  where each process prints  its name
+and rank individually.
+
+0. Study  the code, then compile  and run the application  on the host
+   with six  processes. Remember that you  must use mpirun to  run the
+   MPI processes.
+
+1.   Currently each  process prints  Hello World  individually.  Let's
+   modify the code so that the  printf() is centralized, i.e. only the
+   rank  =  0  process  prints  anything. This  model  is  dubbed  the
+   "boss-worker model",  where the boss  process (typically rank  = 0)
+   distributes and  combines work  that workers (all  other processes)
+   do.   The  provided code  already  has  an if-else  statement  that
+   separates out the boss process code from the worker process code.
+
+   Note: Although in this specific  application the boss only combines
+         the work, typically the boss process also distributes work in
+         the  boss-worker model.   In the  next  step we  will see  an
+         example of this.
+
+   Using MPI_Send() and MPI_Recv(), have  each process report its rank
+   to the boss process. Boss  process should then do "printf("Received
+   Hello from rank  %d\n", rank)" for each rank it  receives from. For
+   this  step,   use  the   wildcard  value   for  source   (source  =
+   MPI_ANY_SOURCE) for Recv().
+
+   Run six  processes on the host  several times and take  note of the
+   order in which the messages are printed.
+   
+   Hint: There  should be a  for-loop on  the boss side.   Each worker
+         process  should  have one  Send()  whereas  the boss  Process
+         should have as many Recv() as there are workers.
+   
+   Note: Although it does not affect this particular application, keep
+         in  mind  that the  MPI_Recv()  and  MPI_Send() are  blocking
+         operations.
+
+2. Modify the code  so that the "Hello"s are received  in order of the
+   rank. First implement this using source argument in Recv(). Run the
+   application a  few times with six  processes on the CPU  to confirm
+   your result.
+   
+   Set the source argument in Recv()  back to the wildcard value, then
+   implement the same  functionality by using tag  argument for Send()
+   and Recv(). Run  the application a few times with  six processes on
+   the CPU to confirm your result.
+
+3. Modify the code so that each  process also reports its name so that
+   the boss can print; printf("Received Hello from rank %d from %s\n",
+   rank, name)
+
+   Hint: Remember that name is a  character array, and that the length
+         of the array to pass must be specified on both sides in order
+         to pass arrays.  In this case,  since the array is short, you
+         can just  send the whole  array by setting count  argument to
+         MPI_MAX_PROCESSOR_NAME. However  for sending parts  of larger
+         arrays  it  is  sometimes  beneficial  to  use  two  sets  of
+         MPI_Send() and  MPI_Recv(), one for  the length of  the array
+         and another for the actual array.
+
+   Run three processes; two processes,  including the boss process, on
+   the CPU and one process on the coprocessor. Check your result.
+

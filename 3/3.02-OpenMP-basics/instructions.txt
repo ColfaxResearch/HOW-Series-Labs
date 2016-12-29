@@ -1,0 +1,28 @@
+NOTE: this  lab follows the  discussion in  Section 3.2.2 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+In this lab you will learn the basics of OpenMP.
+
+1. Modify the  definition for "total_threads" so that  the first print
+   statement  prints   the  correct  value  of   number  of  available
+   threads. Then  modify the  definition for  "thread_id" so  that the
+   "Hello World" statement prints the actual thread number
+
+   Remember to add the appropriate header file and the compiler flags.
+
+2. Parallelize  the "Hello world"  print statement using  "#pragma omp
+   parallel".
+
+3. Using the  num_threads() clause for "#pragma  omp parallel", modify
+   the application so  that "Hello world" is printed from  half of the
+   available threads.
+
+   Note: Sometimes  the argument  to this clause  is an  invalid value
+         (<1). In such cases the parallel region defaults to the total
+         number of available threads.
+
+4. Modify the appropriate environment  variable to run the application
+   with different numbers  of threads.  Be sure to  unset the variable
+   after testing.

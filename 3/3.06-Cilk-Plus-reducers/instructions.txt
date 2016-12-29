@@ -1,0 +1,31 @@
+NOTE: this  lab follows the  discussion in  Section 3.3.5 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+This code  numerically integrates the function  1/sqrt(x) with respect
+to x from  x=0.0 to x=1.0. In this exercise  you will parallelize this
+workload using Intel Cilk Plus and Cilk reducers.
+
+1. First, compile  and run the application to confirm  the result (you
+   may need to reduce nSteps for it to complete in a reasonable amount
+   of time).   Now use "_Cilk_for"  to parallelize the loop,  and then
+   run the application.
+
+   You should  see that the  application runs faster but  produces the
+   wrong result. Can you explain why?
+   
+   Run the same  application with 1 worker by  setting the appropriate
+   environment variable to 1. You  should now see that the application
+   produces the correct result. This is a good method for testing your
+   application  for   race  conditions.   Make  sure   you  unset  the
+   environment variable afterwards, otherwise all subsequent runs with
+   any application in the same terminal session will be serialized.
+   
+2. To  resolve this  type of  race conditions,  Cilk Plus  has special
+   variable types  called "reducers". Implement reduction  by changing
+   the type of variable "integral"  to the corresponding reducer class
+   type, then run the application to check your result.  Note that you
+   will have to include the header file, <cilk/reducer_opadd.h>
+
+

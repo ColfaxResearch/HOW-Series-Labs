@@ -1,0 +1,15 @@
+NOTE: this lab follows the various discussions on Offload in Chapter 2
+of the book "Parallel Programming and Optimization with Intel Xeon Phi
+Coprocessors", second  edition (2015).   The book  can be  obtained at
+xeonphi.com/book
+
+This  is  an  open-ended  exercise.  The  provided  code  is  a  basic
+benchmarking   code   for   offloading    to   a   single   Xeon   Phi
+coprocessor.  Modify  the  code  to benchmark  the  various  types  of
+offloading that we have discussed in the previous two labs.
+
+Some  Ideas: -  Benchmark offload  with memory  retention -  Benchmark
+offload  to  multiple  coprocessors   (hint:  try  offloading  to  all
+coprocessors  from a  single thread,  then from  different threads)  -
+Benchmark  alternative  offload  models  (OpenMP  4.0,  Virtual-shared
+memory model)

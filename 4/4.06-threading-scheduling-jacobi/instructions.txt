@@ -1,0 +1,22 @@
+NOTE: this  lab follows the  discussion in  Section 4.4.3 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+1. Run the benchmark on the host with "make run-cpu" 
+and on the coprocessor with "make run-mic".
+Study the benchmark results with different
+scheduling modes.
+
+2. Modify the code so that only the default scheduling 
+modes is used (without a static, guided or dynamic clause).
+Modify the Makefile and include the compiler arguments "-g -O3".
+Then recompile the code study the performance of the application
+in Intel VTune Amplifier on the CPU using the Advanced Hotspots
+analysis. Can you detect load imbalance in VTune and diagnose 
+that loop scheduling modification can resolve this imbalance?
+
+3. Modify the code again so that only one of the best
+performing scheduling modes are used. Recompile and re-run
+the VTune analysis. Compare the VTune output with that in
+step 2.

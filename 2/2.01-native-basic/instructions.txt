@@ -1,0 +1,24 @@
+NOTE: this lab follows the discussion in Section 2.1.1 to 2.1.3 in the
+book  "Parallel  Programming  and  Optimization with  Intel  Xeon  Phi
+Coprocessors", second  edition (2015).   The book  can be  obtained at
+xeonphi.com/book
+
+In this step we look at how to do native execution through 
+ssh and micnativeloadex. The code simply prints out the number
+of available logical processors (use `man sysconf` to find more)
+
+1. Compile the code for execution on the host, then run it.
+
+2. Now compile it for native execution on the Xeon Phi coprocessor.
+   Copy the binary executable to the coprosessor and run it using ssh.
+
+3. Run the binary executable on the coprocessor using micnativeloadex.
+
+4. Remember that all library dependencies must be accessible
+   by the coprocessor. Compile this code with -qopenmp flag to link
+   OpenMP library. Try to run new executable natively on Xeon Phi.  Hint:
+   Compiled OpenMP library should be copied to mic0:/lib64 with root privileges
+
+5. Delete libiomp5.so from mic0:/lib64. Run the code with micnativeloadex.
+   Set up SINK_LD_LIBRARY_PATH=$MIC_LD_LIBRARY_PATH to resolve 
+   OpenMP library dependency for the code compiled with -qopenmp flag.

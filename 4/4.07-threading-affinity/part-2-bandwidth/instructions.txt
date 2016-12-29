@@ -1,0 +1,17 @@
+NOTE: this  lab follows the  discussion in  Section 4.4.5 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+This exercise demonstrates how to tune thread affinity
+for a bandwidth-bound offload application, using as an example
+a micro-benchmark similar to the "copy" test in the 
+STREAM benchmark.
+
+Run "make" to compile the code. At the end of the compilation,
+"make" prints out instructions for running the application
+on the host and on the coprocessor. Copy and paste the
+commands listed there and try to find the optimum values of
+OMP_NUM_THREADS/KMP_PLACE_THREADS, KMP_AFFINITY and MIC_ENV_PREFIX.
+The goal is to maximize bandwidth both in the host part of the application
+and in the offloaded part.

@@ -1,0 +1,47 @@
+NOTE: this  lab follows the  discussion in  Section 4.5.5 in  the book
+"Parallel   Programming  and   Optimization   with   Intel  Xeon   Phi
+Coprocessors",  second edition  (2015). The  book can  be obtained  at
+xeonphi.com/book
+
+In  this lab,  you will  learn  how to  improve memory  traffic in  an
+application  with pipelined  data processing  through inter-procedural
+loop fusion.
+
+0. Study  the workload in  worker.cc (function RunStatistics()  is the
+   main  function)  and benchmark  it  on  the  host processor  ("make
+   run-cpu") and  on an Intel  Xeon Phi coprocessor  ("make run-mic").
+   The  workload  simulates data  generation  and  processing using  a
+   synthetic  application  that  generates  m  arrays  random  numbers
+   (pipeline stage  1) and then, for each  array, computes statistical
+   properties: mean and standard deviation (pipeline stage 2).
+
+1. Considering  the size  of each  array, n, is  it likely  that after
+   pipeline stage 1 is done, array with m=0 is still in a cache?
+
+   Let's  improve  memory  traffic  by  changing  the  order  of  data
+   processing  phases. Instead  of putting  m arrays  through pipeline
+   stage 1  (data generation) and  then putting them  through pipeline
+   stage 2 (statistics calculation),  let's generate one array compute
+   statistics  on  it;  then  process  then  next  array  and  compute
+   statistics, etc. This  should allow pipeline stage 2  to access the
+   data while it is still in the cache.
+
+   Modify the application by moving  the for-loops over arrays (i from
+   0 to m)  into one function, and turning them into  one loop. In the
+   body     of      this     loop,     GenerateRandomNumbers()     and
+   ComputeMeanAndStdev()  are  called  on  just one  array.   This  is
+   inter-procedural loop fusion.
+
+   Benchmark the  application on the  host and on the  coprocessor and
+   quantify the performance increase.
+
+
+2.  Let's assume that  we do  not need  the intermediate  data (random
+   numbers) once we have run  statistics on them.  In this case, there
+   is no need to have a buffer  that fits m arrays of n numbers. It is
+   sufficient to have one buffer for n numbers.
+
+   Modify the application: reduce its memory footprint by re-using one
+   buffer for n  numbers for each array. Benchmark on  the host and on
+   the Xeon Phi coprocessor and  see if you get a performance increase
+   compared to the previous case. Can you explain it?
