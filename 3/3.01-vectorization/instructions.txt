@@ -59,4 +59,9 @@ vectorization.
    "restrict" to the function signature of my_vector_add().  Note that
    you will need to add an additional flag to the Makefile.  Check the
    optimization report to confirm the results.
-
+   
+6. OPTIONAL: qopt-report has a  verbosity setting.  Enable the highest
+   verbosity setting by modifying  the Makefile  by appending  '=5' to
+   qopt-report   (e.g.   qopt-report=5).   Recompile  and   open   the
+   optimization  report   to  see  the   effect  of  a   more  verbose
+   setting. Hint: you may need to type "make -B" to force recompile.

@@ -25,4 +25,5 @@ In this lab you will learn the basics of OpenMP.
 
 4. Modify the appropriate environment  variable to run the application
    with different numbers  of threads.  Be sure to  unset the variable
-   after testing.
+   after testing. If you are using a queue, you may need to modify the
+   Makefile.

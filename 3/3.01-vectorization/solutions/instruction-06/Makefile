@@ -1,9 +1,9 @@
 CXX = icpc
-CXXFLAGS=
+CXXFLAGS=-restrict
 CPUFLAGS = $(CXXFLAGS) -xhost
 KNCFLAGS = $(CXXFLAGS) -mmic
 KNLFLAGS = $(CXXFLAGS) -xMIC-AVX512
-OPTFLAGS = -qopt-report -qopt-report-file=$@.optrpt
+OPTFLAGS = -qopt-report=5 -qopt-report-file=$@.optrpt
 
 CPUOBJECTS = vectorization.o worker.o
 KNCOBJECTS = vectorization.oKNC worker.oKNC
