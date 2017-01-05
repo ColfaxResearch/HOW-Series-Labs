@@ -47,20 +47,34 @@ all: $(TARGET) instructions
 
 instructions: 
 	$(info )
-	$(info SEE INSTRUCTIONS FOR HOW TO RUN APPLICATIONS: )
+	$(info TO EXECUTE THE APPLICATION: )
+	$(info "make run-cpu" to run the application on the host CPU)
+	$(info "make run-knc" to run the application on the coprocessor)
+	$(info "make run-knl" to run the application on the host KNL)
+	$(info )
+	$(info TO QUEUE THE APPLICATION FOR TORQUE: )
+	$(info "make queue-cpu" to queue application for the host CPU)
+	$(info "make queue-knc" is currently not supported)
+	$(info "make queue-knl" to queue application for the host KNL)
 	$(info )
 
-run-cpu: instructions
+run-cpu: app-CPU
+	mpirun -host localhost -np 4 ./app-CPU
+run-knc: app-KNC
+	scp app-KNC mic0:~/
+	mpirun -host localhost -np 4 LD_LIBRARY_PATH=$(MIC_LD_LIBRARY_PATH) ~/app-KNC
 
-run-knc: instructions
+run-knl: app-KNL
+	mpirun -host localhost -np 4 ./app-KNL
 
-run-knl: instructions
+queue-cpu: app-CPU
+	echo "mpirun -machine \$$PBS_NODEFILE -np 4 `pwd`/app-CPU" | qsub -l nodes=4:xeon -N lab-308-cpu
 
-queue-cpu: instructions
+queue-knc: app-KNC
+	$(info MPI on KNC is not currently supported )
 
-queue-knc: instructions
-
-queue-knl: instructions
+queue-knl: app-KNL
+	echo "mpirun -machine \$$PBS_NODEFILE -np 4 `pwd`/app-KNL" | qsub -l nodes=4:knl -N lab-308-knl
 
 clean: 
 	rm -f $(CPUOBJECTS) $(KNCOBJECTS) $(KNLOBJECTS) $(TARGET) *.optrpt
