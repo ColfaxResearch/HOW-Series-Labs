@@ -10,7 +10,6 @@ KNCOBJECTS = vectorization.oKNC worker.oKNC
 KNLOBJECTS = vectorization.oKNL worker.oKNL
 
 TARGET=app-CPU app-KNC app-KNL
-CXX=icpc
 
 .SUFFIXES: .o .cc .oKNC .oKNL
 
@@ -51,11 +50,17 @@ instructions:
 	$(info FOR THIS LAB, TAKE A LOOK AT THE VRIOUS OPTIMIZATION REPORTS: )
 	$(info )
 
-run-cpu: app-CPU instructions
+run-cpu: instructions
 
-run-knc: app-KNC instructions
+run-knc: instructions
 
-run-knl: app-KNL instructions
+run-knl: instructions
+
+queue-cpu: instructions
+
+queue-knc: instructions
+
+queue-knl: instructions
 
 clean: 
 	rm -f $(CPUOBJECTS) $(KNCOBJECTS) $(KNLOBJECTS) $(TARGET) *.optrpt

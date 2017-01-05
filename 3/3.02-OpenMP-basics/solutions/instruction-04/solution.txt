@@ -6,3 +6,6 @@ To run the application with 10 threads:
 //// ... output ... ////
 
 [vega@lyra 3.2-OpenMP-basics]$ unset OMP_NUM_THREADS
+
+
+For Torque queue, refer to the Makefile.

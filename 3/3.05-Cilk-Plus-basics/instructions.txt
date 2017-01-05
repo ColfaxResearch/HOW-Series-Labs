@@ -29,5 +29,3 @@ In this step you will learn the basics of Cilk Plus.
 
 3. Modify the appropriate environment  variable to run the application
    with different numbers of workers.
-
-LocalWords:  cilk

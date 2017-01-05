@@ -10,7 +10,6 @@ KNCOBJECTS = hello.oKNC
 KNLOBJECTS = hello.oKNL
 
 TARGET=app-CPU app-KNC app-KNL
-CXX=icpc
 
 .SUFFIXES: .o .cc .oKNC .oKNL
 
@@ -70,14 +69,14 @@ run-knl: app-KNL
 	./app-KNL
 
 queue-cpu: app-CPU
-	echo "`pwd`/app-CPU" | qsub -l nodes=1:xeon
+	echo "OMP_NUM_THREADS=10 `pwd`/app-CPU" | qsub -l nodes=1:xeon -N lab-302-cpu
 
 queue-knc: app-KNC
 	echo "scp `pwd`/app-KNC mic0:~/; \
-	ssh mic0 LD_LIBRARY_PATH=$(MIC_LD_LIBRARY_PATH) ./app-KNC"  | qsub -l nodes=1:knc
+	      ssh mic0 OMP_NUM_THREADS=10 LD_LIBRARY_PATH=$(MIC_LD_LIBRARY_PATH) ./app-KNC"  | qsub -l nodes=1:knc -N lab-302-knc
 
 queue-knl: app-KNL
-	echo "`pwd`/app-KNL" | qsub -l nodes=1:knl
+	echo "OMP_NUM_THREADS=10 `pwd`/app-KNL" | qsub -l nodes=1:knl -N lab-302-knl
 
 clean: 
 	rm -f $(CPUOBJECTS) $(KNCOBJECTS) $(KNLOBJECTS) $(TARGET) *.optrpt
