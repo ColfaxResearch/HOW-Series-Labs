@@ -1,22 +1,21 @@
 1)
 
 [vega@lyra 2.2-nativeMPI]$ mpiicpc helloMPI.cc -o helloMPI.XEON
-[vega@lyra 2.2-nativeMPI]$ mpirun -host localhost -np 1 ./helloMPI.XEON 
+[vega@lyra 2.2-nativeMPI]$ echo "mpirun -host localhost -np 1 `pwd`/helloMPI.XEON" | qsub -l nodes=1:xeon -N helloMPI.XEON
+[vega@lyra 2.2-nativeMPI]$ cat helloMPI.XEON.o123
 Hello world! I have 48 logical cores.
 
 2) We assume /opt/intel folder is NFS-mounted on Intel Xeon Phi coprocessors.
 
 [vega@lyra 2.2-nativeMPI]$ mpiicpc -mmic helloMPI.cc -o helloMPI.MIC
-[vega@lyra 2.2-nativeMPI]$ export I_MPI_MIC=1
-ra 2.2-nativeMPI]$ scp helloMPI.MIC mic0:~/
-helloMPI.MIC                                  100%   11KB  11.4KB/s   00:00    
-[vega@lyra 2.2-nativeMPI]$ mpirun -host mic0 -np 1 ~/helloMPI.MIC
+[vega@lyra 2.2-nativeMPI]$ echo "export I_MPI_MIC=1; scp `pwd`/helloMPI.MIC mic0:~/; mpirun -host mic0 -np 1 /home/guest/helloMPI.MIC" | qsub -l nodes=1:knc -N helloMPI.MIC
+[vega@lyra 2.2-nativeMPI]$ cat helloMPI.MIC.o123
 Hello world! I have 244 logical cores.
 
 3)
 
-[vega@lyra 2.2-nativeMPI]$ mpirun -host localhost -np 1 ./helloMPI.XEON : -host mic0 -np 1 ~/helloMPI.MIC : -host mic1 -np 1 ~/helloMPI.MIC
+[vega@lyra 2.2-nativeMPI]$ echo "export I_MPI_MIC=1; scp `pwd`/helloMPI.MIC mic0:~/; mpirun -host localhost -np 1 `pwd`/helloMPI.XEON : -host mic0 -np 1 /home/guest/helloMPI.MIC" | qsub -l nodes=1:knc -N helloMPI.HYBRID
+[vega@lyra 2.2-nativeMPI]$ cat helloMPI.HYBRID.o123
 Hello world! I have 48 logical cores.
-Hello world! I have 244 logical cores.
 Hello world! I have 244 logical cores.
 
