@@ -12,10 +12,12 @@ hello.MIC        100%   11KB 10.6KB/s   00:00
 [vega@lyra 2.1-native]$ ssh mic0 ~/hello.MIC
 Hello world! I have 244 logical cores.
 
+
 3)
 
 [vega@lyra 2.1-native]$ micnativeloadex hello.MIC
 Hello world! I have 244 logical cores.
+
 
 4)
 

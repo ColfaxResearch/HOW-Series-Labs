@@ -1,0 +1,99 @@
+##################### Warning #######################
+# These solutions are specific to the Torque server #
+# set up in the Colfax Cluster. The commands shown  #
+# here may not work "as is" on other clusters.      #
+#####################################################
+
+1)
+
+[vega@lyra 2.1-native]$ icpc hello.cc -o hello.XEON
+[vega@lyra 2.1-native]$ ./hello.XEON | qsub -l nodes=1:xeon -N hello.XEON
+[vega@lyra 2.1-native]$ cat hello.XEON.o123
+Hello world! I have 48 logical cores.
+
+2)
+
+vega@lyra 2.1-native]$ icpc -mmic hello.cc -o hello.MIC
+[vega@lyra 2.1-native]$ echo "scp `pwd`/hello.MIC mic0:~/;
+> ssh mic0 ./hello.MIC" | qsub -l nodes=1:knc -N hello.MIC
+[vega@lyra 2.1-native]$ cat hello.MIC.o123
+Hello world! I have 244 logical cores.
+
+3)
+
+[vega@lyra 2.1-native]$ echo "micnativeloadex hello.MIC" | qsub -l nodes=1:knc -N hello.MIC
+[vega@lyra 2.1-native]$ cat hello.MIC.o123
+Hello world! I have 244 logical cores.
+
+4)
+
+[vega@lyra 2.1-native]$ icpc -mmic -qopenmp hello.cc -o hello-openmp.MIC
+[vega@lyra 2.1-native]$ echo "scp `pwd`/hello-openmp.MIC mic0:~/;
+> ssh mic0 ./hello-openmp.MIC" | qsub -l nodes=1:knc -N hello-openmp.MIC
+[vega@lyra 2.1-native]$ cat hello-openmp.MIC.e123
+./hello-openmp.MIC: error while loading shared libraries:
+libiomp5.so: cannot open shared object file: No such file or directory
+
+[vega@lyra 2.1-native]$ echo "scp `pwd`/hello-openmp.MIC mic0:~/;
+> ssh mic0 ldd ~/hello-openmp.MIC" | qsub -l nodes=1:knc -N ldd 
+[vega@lyra 2.1-native]$ cat ldd.o124
+	linux-vdso.so.1 =>  (0x00007fff639ff000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007f52f82bb000)
+	libiomp5.so => not found
+	libstdc++.so.6 => /usr/lib64/libstdc++.so.6 (0x00007f52f7fc1000)
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f52f7daf000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007f52f7b92000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007f52f783a000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x00007f52f7636000)
+	/lib64/ld-linux-k1om.so.2 (0x00007f52f84ea000)
+
+[vega@lyra 2.1-native]$ find /opt/intel/compilers_and_libraries* -name libiomp5.so
+/opt/intel/compilers_and_libraries_2017.0.098/linux/compiler/lib/intel64_lin/libiomp5.so
+/opt/intel/compilers_and_libraries_2017.0.098/linux/compiler/lib/intel64_lin_mic/libiomp5.so
+
+[vega@lyra 2.1-native]$ echo "scp /opt/intel/compilers_and_libraries_2017.0.098/linux/compiler/lib/intel64_lin_mic/libiomp5.so mic0:~/;
+> scp `pwd`/hello-openmp.MIC mic0:~/; ssh mic0 LD_LIBRARY_PATH=/home/guest ./hello-openmp.MIC;" | qsub -l nodes=1:knc -N hello-openmp.MIC 
+[vega@lyra 2.1-native]$ cat hello-openmp.MIC.o126
+Hello world! I have 244 logical cores.
+
+5)
+
+[vega@lyra 2.1-native]$ echo "micnativeloadex `pwd`/hello-openmp.MIC" | qsub -l nodes=1:knc -N hello-openmp.MIC
+[vega@lyra 2.1-native]$ cat hello-openmp.MIC.e123
+The remote process indicated that the following libraries could not be
+loaded:	libiomp5.so 
+[vega@lyra 2.1-native]$ cat hello-openmp.MIC.o123
+Error creating remote process, at least one library dependency is missing.
+Please check the list of dependencies below to see which
+one is missing and update the SINK_LD_LIBRARY_PATH
+environment variable to include the missing library.
+
+
+Dependency information for hello-openmp.MIC
+
+	Full path was resolved as 
+	/home/vega/labs/2/2.1-native/hello-openmp.MIC
+
+	Binary was built for Intel(R) Xeon Phi(TM) Coprocessor
+	(codename: Knights Corner) architecture
+
+	SINK_LD_LIBRARY_PATH = 
+
+	Dependencies Found:
+		(none found)
+
+	Dependencies Not Found Locally (but may exist already on the
+coprocessor):
+		libm.so.6
+		libiomp5.so
+		libstdc++.so.6
+		libgcc_s.so.1
+		libpthread.so.0
+		libc.so.6
+		libdl.so.2
+
+[vega@lyra 2.1-native]$ echo "export SINK_LD_LIBRARY_PATH=$MIC_LD_LIBRARY_PATH 
+> micnativeloadex `pwd`/hello-openmp.MIC" | qsub -l nodes=1:knc -N hello-openmp.MIC
+[vega@lyra 2.1-native]$ cat hello-openmp.MIC.o124
+Hello world! I have 244 logical cores.
+

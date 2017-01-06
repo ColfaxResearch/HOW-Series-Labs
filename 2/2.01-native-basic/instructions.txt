@@ -10,14 +10,23 @@ of available logical processors (use `man sysconf` to find more)
 1. Compile the code for execution on the host, then run it.
 
 2. Now compile it for native execution on the Xeon Phi coprocessor.
-   Copy the binary executable to the coprosessor and run it using ssh.
+   If you are directly on a system with a coprocessor, copy 
+   the binary executable to the coprosessor and run it using ssh.
+
+   If you are on a torque cluster, submit a torque job to run the
+   executable. Remember that your job will be running from a remote
+   Intel Xeon host, so you will need to copy the executable to the
+   coprocessor and execute it there using ssh.
 
 3. Run the binary executable on the coprocessor using micnativeloadex.
+   Once again, if you are on a torque cluster, you must do this through
+   a job submission.
 
 4. Remember that all library dependencies must be accessible
    by the coprocessor. Compile this code with -qopenmp flag to link
-   OpenMP library. Try to run new executable natively on Xeon Phi.  Hint:
-   Compiled OpenMP library should be copied to mic0:/lib64 with root privileges
+   OpenMP library. Try to run new executable natively on Xeon Phi.  
+   Hint: If you have root privilages, compiled OpenMP library should be 
+         copied to mic0:/lib64. Otherwise, copy it to the home directory.
 
 5. Delete libiomp5.so from mic0:/lib64. Run the code with micnativeloadex.
    Set up SINK_LD_LIBRARY_PATH=$MIC_LD_LIBRARY_PATH to resolve 
