@@ -14,7 +14,10 @@ void LU_decomp(const int n,
   // U is returned at and above main diagonal
 #ifdef __MIC__
   const int tile=32;  // Tuning parameters
-  const int btile=16; // for MIC
+  const int btile=16; // for KNC
+#elif KNLTILE
+  const int tile=32;  // Tuning parameters
+  const int btile=16; // for KNL
 #else
   const int tile=16;  // Tuning parameters
   const int btile=8;  // for CPU
@@ -42,7 +45,7 @@ void LU_decomp(const int n,
       for (int i = b+1; i < bb+btile; i++) {
 	L[i*n + b] = A[i*n + b]*recDiag;
 #pragma vector aligned
-#pragma ivdep
+#pragma simd
 	for (int j = jMin; j < n; j++) 
 	  A[i*n + j] -= L[i*n + b]*A[b*n + j];
       }
@@ -57,7 +60,7 @@ void LU_decomp(const int n,
       for (int b = bb; b < bb+btile; b ++) {
 	L[i*n + b] = A[i*n + b]*recDiagEl[b-bb];
 #pragma vector aligned
-#pragma ivdep
+#pragma simd
 	for (int j = jMin; j < jMin+tile; j++) 
 	  A[i*n + j] -= L[i*n + b]*A[b*n + j];
       }

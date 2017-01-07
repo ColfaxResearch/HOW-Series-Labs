@@ -1,10 +1,6 @@
-
-
-
 #include <cassert>
 #include <cmath>
 #include <cstdio>
-#include <mkl_vsl.h>
 #include <omp.h>
 
 struct ParticleSet { 
@@ -16,27 +12,32 @@ void MoveParticles(const int nParticles, ParticleSet& particle, const float dt) 
 
 #ifdef __MIC__
   const int tileSize = 16;
+#elif KNLTILE
+  const int tileSize = 16;
 #else
   const int tileSize = 8;
 #endif
-  assert(nParticles%tileSize == 0);
 
+  assert(nParticles%tileSize == 0);
   // Loop over particles that experience force
-#pragma omp parallel for
+#pragma omp parallel for schedule(guided)
   for (int ii = 0; ii < nParticles; ii += tileSize) { 
 
     // Components of the gravity force on particles ii through ii+tileSize
     float Fx[tileSize], Fy[tileSize], Fz[tileSize];
-    Fx[:] = Fy[:] = Fz[:] = 0;
+    Fx[:] = Fy[:] = Fz[:] = 0.0f;
     
     // Avoid singularity and interaction with self
-    const float softening = 1e-20;
+    const float softening = 1e-20f;
 
     // Loop over particles that exert force
+#ifdef KNLTILE
 #pragma unroll(tileSize)
+#endif
     for (int j = 0; j < nParticles; j++) {
 
       // Loop within tile over particles that experience force
+#pragma vector aligned
       for (int i = ii; i < ii + tileSize; i++) {
 
 	  // Newton's law of universal gravity
@@ -50,8 +51,8 @@ void MoveParticles(const int nParticles, ParticleSet& particle, const float dt) 
 	  Fx[i-ii] += dx * drPowerN32;  
 	  Fy[i-ii] += dy * drPowerN32;  
 	  Fz[i-ii] += dz * drPowerN32;
-	}
       }
+    }
 
     // Accelerate particles in response to the gravitational force
     particle.vx[ii:tileSize] += dt*Fx[0:tileSize]; 
@@ -61,6 +62,8 @@ void MoveParticles(const int nParticles, ParticleSet& particle, const float dt) 
 
   // Move particles according to their velocities
   // O(N) work, so using a serial loop
+#pragma simd
+#pragma vector aligned
   for (int i = 0 ; i < nParticles; i++) { 
     particle.x[i]  += particle.vx[i]*dt;
     particle.y[i]  += particle.vy[i]*dt;
@@ -79,23 +82,35 @@ int main(const int argc, const char** argv) {
   // this may not be good in object-oriented programming,
   // however, makes vectorization much more efficient
   ParticleSet particle;
-  particle.x  = new float[nParticles];
-  particle.y  = new float[nParticles];
-  particle.z  = new float[nParticles];
-  particle.vx = new float[nParticles];
-  particle.vy = new float[nParticles];
-  particle.vz = new float[nParticles];
+  particle.x  = (float*) _mm_malloc(sizeof(float)*nParticles,64);
+  particle.y  = (float*) _mm_malloc(sizeof(float)*nParticles,64);
+  particle.z  = (float*) _mm_malloc(sizeof(float)*nParticles,64);
+  particle.vx = (float*) _mm_malloc(sizeof(float)*nParticles,64);
+  particle.vy = (float*) _mm_malloc(sizeof(float)*nParticles,64);
+  particle.vz = (float*) _mm_malloc(sizeof(float)*nParticles,64);
+
+  // First touch allocation
+#pragma omp parallel for 
+  for(int i = 0; i < nParticles; i++) {
+    particle.x[i] = 0;
+    particle.y[i] = 0;
+    particle.z[i] = 0;
+    particle.vx[i] = 0;
+    particle.vy[i] = 0;
+    particle.vz[i] = 0;
+  }
 
   // Initialize random number generator and particles
-  VSLStreamStatePtr rnStream;  
-  vslNewStream( &rnStream, VSL_BRNG_MT19937, 1);
-  vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, nParticles, particle.x,  -1.0f, 1.0f);
-  vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, nParticles, particle.y,  -1.0f, 1.0f);
-  vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, nParticles, particle.z,  -1.0f, 1.0f);
-  vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, nParticles, particle.vx, -1.0f, 1.0f);
-  vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, nParticles, particle.vy, -1.0f, 1.0f);
-  vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, rnStream, nParticles, particle.vz, -1.0f, 1.0f);
-
+  srand(0);
+  for(int i = 0; i < nParticles; i++) {
+    particle.x[i] = rand()/RAND_MAX;
+    particle.y[i] = rand()/RAND_MAX;
+    particle.z[i] = rand()/RAND_MAX;
+    particle.vx[i] = rand()/RAND_MAX;
+    particle.vy[i] = rand()/RAND_MAX;
+    particle.vz[i] = rand()/RAND_MAX;
+  }
+  
   // Perform benchmark
   printf("\n\033[1mNBODY Version 04\033[0m\n");
   printf("\nPropagating %d particles using %d threads on %s...\n\n", 
@@ -134,10 +149,10 @@ int main(const int argc, const char** argv) {
 	 "Average performance:", "", rate, dRate);
   printf("-----------------------------------------------------\n");
   printf("* - warm-up, not included in average\n\n");
-  delete particle.x;
-  delete particle.y;
-  delete particle.z;
-  delete particle.vx;
-  delete particle.vy;
-  delete particle.vz;
+  _mm_free( particle.x );
+  _mm_free( particle.y );
+  _mm_free( particle.z );
+  _mm_free( particle.vx );
+  _mm_free( particle.vy );
+  _mm_free( particle.vz );
 }

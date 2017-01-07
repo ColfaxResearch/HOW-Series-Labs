@@ -14,6 +14,8 @@ void LU_decomp(const int n,
   // U is returned at and above main diagonal
 #ifdef __MIC__
   const int tile=32;
+#elif KNLTILE
+  const int tile=32;
 #else
   const int tile=8;
 #endif
@@ -33,7 +35,7 @@ void LU_decomp(const int n,
       // Aligned data hint:
 #pragma vector aligned
       // Pointer disambiguation:
-#pragma ivdep
+#pragma simd
       // Regularized patern of vector loop:
       for (int j = jMin; j < n; j++) 
 	A[i*n + j] -= L[i*n+b]*A[b*n + j];

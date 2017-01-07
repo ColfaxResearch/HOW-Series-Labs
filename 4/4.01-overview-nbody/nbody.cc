@@ -1,9 +1,15 @@
-
-
+/* Copyright (c) 2013-2015, Colfax International. All Right Reserved.
+This file, labs/4/4.01-overview-nbody/nbody.cc,
+is a part of Supplementary Code for Practical Exercises for the handbook
+"Parallel Programming and Optimization with Intel Xeon Phi Coprocessors",
+2nd Edition -- 2015, Colfax International,
+ISBN 9780988523401 (paper), 9780988523425 (PDF), 9780988523432 (Kindle).
+Redistribution or commercial usage without written permission 
+from Colfax International is prohibited.
+Contact information can be found at http://colfax-intl.com/     */
 
 #include <cmath>
 #include <cstdio>
-#include <mkl_vsl.h>
 #include <omp.h>
 
 struct ParticleType { 
@@ -46,7 +52,6 @@ void MoveParticles(const int nParticles, ParticleType* const particle, const flo
   }
 
   // Move particles according to their velocities
-  // O(N) work, so using a serial loop
   for (int i = 0 ; i < nParticles; i++) { 
     particle[i].x  += particle[i].vx*dt;
     particle[i].y  += particle[i].vy*dt;
@@ -67,10 +72,15 @@ int main(const int argc, const char** argv) {
   ParticleType* particle = new ParticleType[nParticles];
 
   // Initialize random number generator and particles
-  VSLStreamStatePtr rnStream;  
-  vslNewStream( &rnStream, VSL_BRNG_MT19937, 1 );
-  vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, 
-	       rnStream, 6*nParticles, (float*)particle, -1.0f, 1.0f);
+  srand(0);
+  for(int i = 0; i < nParticles; i++) {
+    particle[i].x = rand()/RAND_MAX;
+    particle[i].y = rand()/RAND_MAX;
+    particle[i].z = rand()/RAND_MAX;
+    particle[i].vx = rand()/RAND_MAX;
+    particle[i].vy = rand()/RAND_MAX;
+    particle[i].vz = rand()/RAND_MAX;
+  }
   
   // Perform benchmark
   printf("\n\033[1mNBODY Version 00\033[0m\n");

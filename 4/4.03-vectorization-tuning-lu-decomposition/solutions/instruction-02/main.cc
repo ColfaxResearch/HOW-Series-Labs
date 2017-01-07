@@ -14,6 +14,8 @@ void LU_decomp(const int n,
   // U is returned at and above main diagonal
 #ifdef __MIC__
   const int tile=32;
+#elif KNLTILE
+  const int tile=32;
 #else
   const int tile=8;
 #endif

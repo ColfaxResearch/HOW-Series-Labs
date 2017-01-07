@@ -1,9 +1,5 @@
-
-
-
 #include <cmath>
 #include <cstdio>
-#include <mkl_vsl.h>
 #include <omp.h>
 
 struct ParticleType { 
@@ -14,7 +10,7 @@ struct ParticleType {
 void MoveParticles(const int nParticles, ParticleType* const particle, const float dt) {
 
   // Loop over particles that experience force
-#pragma omp parallel for
+#pragma omp parallel for schedule(guided)
   for (int i = 0; i < nParticles; i++) { 
 
     // Components of the gravity force on particle i
@@ -67,11 +63,27 @@ int main(const int argc, const char** argv) {
   // but inefficient for the purposes of vectorization
   ParticleType* particle = new ParticleType[nParticles];
 
+  // First touch allocation
+#pragma omp parallel for
+  for(int i = 0; i < nParticles; i++) {
+    particle[i].x = 0;
+    particle[i].y = 0;
+    particle[i].z = 0;
+    particle[i].vx = 0;
+    particle[i].vy = 0;
+    particle[i].vz = 0;
+  }
+
   // Initialize random number generator and particles
-  VSLStreamStatePtr rnStream;  
-  vslNewStream( &rnStream, VSL_BRNG_MT19937, 1 );
-  vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, 
-	       rnStream, 6*nParticles, (float*)particle, -1.0f, 1.0f);
+  srand(0);
+  for(int i = 0; i < nParticles; i++) {
+    particle[i].x = rand()/RAND_MAX;
+    particle[i].y = rand()/RAND_MAX;
+    particle[i].z = rand()/RAND_MAX;
+    particle[i].vx = rand()/RAND_MAX;
+    particle[i].vy = rand()/RAND_MAX;
+    particle[i].vz = rand()/RAND_MAX;
+  }
   
   // Perform benchmark
   printf("\n\033[1mNBODY Version 01\033[0m\n");

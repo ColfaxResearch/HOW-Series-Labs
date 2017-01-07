@@ -18,7 +18,14 @@ void MoveParticles(const int nParticles, ParticleSet& particle, const float dt, 
   const int startParticle = (mpiRank    )*myParticles;
   const int endParticle   = (mpiRank + 1)*myParticles;
 
+#ifdef __MIC__
   const int tileSize = 16;
+#elif KNLTILE
+  const int tileSize = 16;
+#else
+  const int tileSize = 8;
+#endif
+
   assert(myParticles%tileSize == 0);
 
   // Loop over particles that experience force
@@ -33,11 +40,13 @@ void MoveParticles(const int nParticles, ParticleSet& particle, const float dt, 
       const float softening = 1e-20;
   
       // Loop over particles that exert force
+#ifdef KNLTILE
 #pragma unroll(tileSize)
+#endif
       for (int j = 0; j < nParticles; j++) { 
     
 	// Loop within tile over particles that experience force
-#pragma unroll(tileSize)
+#pragma vector aligned
 	for (int i = ii; i < ii + tileSize; i++) {
 
 	  // Newton's law of universal gravity
@@ -62,6 +71,8 @@ void MoveParticles(const int nParticles, ParticleSet& particle, const float dt, 
 
   // Move particles according to their velocities
   // O(N) work, so using a serial loop
+#pragma simd
+#pragma vector aligned
   for (int i = 0 ; i < nParticles; i++) { 
     particle.x[i]  += particle.vx[i]*dt;
     particle.y[i]  += particle.vy[i]*dt;

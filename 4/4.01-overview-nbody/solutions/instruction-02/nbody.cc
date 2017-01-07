@@ -1,9 +1,5 @@
-
-
-
 #include <cmath>
 #include <cstdio>
-#include <mkl_vsl.h>
 #include <omp.h>
 
 struct ParticleType { 
@@ -14,29 +10,29 @@ struct ParticleType {
 void MoveParticles(const int nParticles, ParticleType* const particle, const float dt) {
 
   // Loop over particles that experience force
-#pragma omp parallel for
+#pragma omp parallel for schedule(guided)
   for (int i = 0; i < nParticles; i++) { 
 
     // Components of the gravity force on particle i
-    float Fx = 0, Fy = 0, Fz = 0; 
+    float Fx = 0.0f, Fy = 0.0f, Fz = 0.0f; 
       
     // Loop over particles that exert force: vectorization expected here
     for (int j = 0; j < nParticles; j++) { 
       
       // Avoid singularity and interaction with self
-      const float softening = 1e-20;
+      const float softening = 1e-20f;
 
       // Newton's law of universal gravity
       const float dx = particle[j].x - particle[i].x;
       const float dy = particle[j].y - particle[i].y;
       const float dz = particle[j].z - particle[i].z;
       const float rr  = 1.0f/sqrtf(dx*dx + dy*dy + dz*dz + softening);
-      const float drPower32  = rr*rr*rr;
+      const float drPowerN32  = rr*rr*rr;
 	
       // Calculate the net force
-      Fx += dx * drPower32;  
-      Fy += dy * drPower32;  
-      Fz += dz * drPower32;
+      Fx += dx * drPowerN32;  
+      Fy += dy * drPowerN32;  
+      Fz += dz * drPowerN32;
 
     }
 
@@ -67,11 +63,27 @@ int main(const int argc, const char** argv) {
   // but inefficient for the purposes of vectorization
   ParticleType* particle = new ParticleType[nParticles];
 
+  // First touch allocation
+#pragma omp parallel for
+  for(int i = 0; i < nParticles; i++) {
+    particle[i].x = 0;
+    particle[i].y = 0;
+    particle[i].z = 0;
+    particle[i].vx = 0;
+    particle[i].vy = 0;
+    particle[i].vz = 0;
+  }
+
   // Initialize random number generator and particles
-  VSLStreamStatePtr rnStream;  
-  vslNewStream( &rnStream, VSL_BRNG_MT19937, 1 );
-  vsRngUniform(VSL_RNG_METHOD_UNIFORM_STD, 
-	       rnStream, 6*nParticles, (float*)particle, -1.0f, 1.0f);
+  srand(0);
+  for(int i = 0; i < nParticles; i++) {
+    particle[i].x = rand()/RAND_MAX;
+    particle[i].y = rand()/RAND_MAX;
+    particle[i].z = rand()/RAND_MAX;
+    particle[i].vx = rand()/RAND_MAX;
+    particle[i].vy = rand()/RAND_MAX;
+    particle[i].vz = rand()/RAND_MAX;
+  }
   
   // Perform benchmark
   printf("\n\033[1mNBODY Version 02\033[0m\n");
