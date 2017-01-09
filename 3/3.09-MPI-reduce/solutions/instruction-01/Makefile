@@ -74,7 +74,7 @@ queue-knc: app-KNC
 	$(info MPI on KNC is not currently supported )
 
 queue-knl: app-KNL
-	echo "mpirun -machine \$$PBS_NODEFILE -np 4 `pwd`/app-KNL" | qsub -l nodes=4:knl -N lab-309-knl
+	echo "mpirun -machine \$$PBS_NODEFILE -np 4 `pwd`/app-KNL" | qsub -l nodes=4:knl:xeonphi -N lab-309-knl
 
 clean: 
 	rm -f $(CPUOBJECTS) $(KNCOBJECTS) $(KNLOBJECTS) $(TARGET) *.optrpt

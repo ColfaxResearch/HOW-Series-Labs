@@ -17,7 +17,7 @@ run-cpu: runme
 	./runme
 
 queue-cpu: runme
-	echo "`pwd`/runme" | qsub -l nodes=1:knc -N lab-206-cpu
+	echo "`pwd`/runme" | qsub -l nodes=1:knc:coprocessor -N lab-206-cpu
 
 clean: 
 	rm -f *.o runme

@@ -3,9 +3,13 @@
 
 void Histogram(const float* age, int* const hist, const int n, const float group_width,
     const int m) {
-
+#ifdef __MIC__
     const int vecLen = 16; // Length of vectorized loop (lower is better,
                            // but a multiple of 64/sizeof(int))
+#else
+    const int vecLen = 32; // Length of vectorized loop (lower is better,
+                           // but a multiple of 64/sizeof(int))
+#endif
     const float recGroupWidth = 1.0f/group_width; // Pre-compute the reciprocal
     const int nPrime = n - n%vecLen; // nPrime is a multiple of vecLen
 

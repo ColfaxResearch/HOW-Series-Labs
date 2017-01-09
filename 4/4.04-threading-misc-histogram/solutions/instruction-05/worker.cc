@@ -5,21 +5,24 @@
 
 void Histogram(const float* age, int* const hist, const int n, const float group_width,
     const int m) {
-
+#ifdef __MIC__
     const int vecLen = 16; // Length of vectorized loop (lower is better,
                            // but a multiple of 64/sizeof(int))
+#else
+    const int vecLen = 32; // Length of vectorized loop (lower is better,
+                           // but a multiple of 64/sizeof(int))
+#endif
     const float recGroupWidth = 1.0f/group_width; // Pre-compute the reciprocal
     const int nPrime = n - n%vecLen; // nPrime is a multiple of vecLen
     const int nThreads = omp_get_max_threads();
     // Shared histogram with a private section for each thread
-    int mPadded = m + (64 - m%64);
-    int hist_global[nThreads*mPadded];
+    int hist_global[nThreads*m];
 
     // Strip-mining the loop in order to vectorize the inner short loop
 #pragma omp parallel 
     {
         // Private variable to hold a copy of histogram in each thread
-        int* hist_priv = &hist_global[omp_get_thread_num()*mPadded];
+        int* hist_priv = &hist_global[omp_get_thread_num()*m];
         hist_priv[0:m] = 0;
 
         // Temporary storage for vecLen indices. Necessary for vectorization

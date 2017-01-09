@@ -71,13 +71,13 @@ run-knl: app-KNL
 	mpirun -host localhost -np 4 -genv KMP_AFFINITY=compact,granularity=fine ./app-KNL $(NSIZE)
 
 queue-cpu: app-CPU
-	echo "mpirun -machinefile \$$PBS_NODEFILE -np 4 -genv KMP_AFFINITY=compact,granularity=fine `pwd`/app-KNL $(NSIZE)" | qsub -l nodes=4:xeon -N lab-401-cpu
+	echo "mpirun -machinefile \$$PBS_NODEFILE -np 4 -genv KMP_AFFINITY=compact,granularity=fine `pwd`/app-CPU $(NSIZE)" | qsub -l nodes=4:xeon -N lab-401-cpu
 
 queue-knc: 
 	$(info This feature is currently unsupported)
 
 queue-knl: app-KNL
-	echo "mpirun -machinefile \$$PBS_NODEFILE -np 4 -genv KMP_AFFINITY=compact,granularity=fine `pwd`/app-KNL $(NSIZE)" | qsub -l nodes=4:knl:cache -N lab-401-knl
+	echo "mpirun -machinefile \$$PBS_NODEFILE -np 4 -genv KMP_AFFINITY=compact,granularity=fine numactl -m 1 `pwd`/app-KNL $(NSIZE)" | qsub -l nodes=4:knl:xeonphi:flat -N lab-401-knl
 
 clean: 
 	rm -f $(CPUOBJECTS) $(KNCOBJECTS) $(KNLOBJECTS) $(TARGET) *.optrpt

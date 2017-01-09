@@ -75,10 +75,10 @@ queue-cpu: app-CPU
 
 queue-knc: app-KNC
 	echo "scp `pwd`/app-KNC mic0:~/; \
-	      ssh mic0 LD_LIBRARY_PATH=$(MIC_LD_LIBRARY_PATH) /home/guest/app-KNC $(NSIZE)" | qsub -l nodes=1:knc -N lab-401-knc
+	      ssh mic0 LD_LIBRARY_PATH=$(MIC_LD_LIBRARY_PATH) /home/guest/app-KNC $(NSIZE)" | qsub -l nodes=1:knc:coprocessor -N lab-401-knc
 
 queue-knl: app-KNL
-	echo "`pwd`/app-KNL $(NSIZE)" | qsub -l nodes=1:knl -N lab-401-knl
+	echo "`numactl -m 1 pwd`/app-KNL $(NSIZE)" | qsub -l nodes=1:knl:xeonphi:flat -N lab-401-knl
 
 clean: 
 	rm -f $(CPUOBJECTS) $(KNCOBJECTS) $(KNLOBJECTS) $(TARGET) *.optrpt

@@ -1,53 +1,82 @@
 CXX = icpc
-CXXFLAGS=-qopenmp -mkl
+CXXFLAGS=-qopenmp
 CPUFLAGS = $(CXXFLAGS) -xhost
-MICFLAGS = $(CXXFLAGS) -mmic
+KNCFLAGS = $(CXXFLAGS) -mmic
+KNLFLAGS = $(CXXFLAGS) -xMIC_AVX512 -DKNLTILE
 OPTFLAGS = -qopt-report -qopt-report-file=$@.optrpt
 
 CPUOBJECTS = main.o worker.o
-MICOBJECTS = main.oMIC worker.oMIC
+KNCOBJECTS = main.oKNC worker.oKNC
+KNLOBJECTS = main.oKNL worker.oKNL
 
-TARGET=app-CPU app-MIC
-CXX=icpc
+TARGET=app-CPU app-KNC app-KNL
 
-.SUFFIXES: .o .cc .oMIC
+.SUFFIXES: .o .cc .oKNC .oKNL
 
 all: $(TARGET) instructions
 
 %-CPU: $(CPUOBJECTS)
 	$(info )
 	$(info Linking the CPU executable:)
-	$(CXX) $(CPUFLAGS) -o $@ $(CPUOBJECTS)
+	$(CXX) $(CXXFLAGS) $(CPUFLAGS) -o $@ $(CPUOBJECTS)
 
-%-MIC: $(MICOBJECTS)
+%-KNC: $(KNCOBJECTS)
 	$(info )
-	$(info Linking the MIC executable:)
-	$(CXX) $(MICFLAGS) -o $@ $(MICOBJECTS)
+	$(info Linking the KNC executable:)
+	$(CXX) $(CXXFLAGS) $(KNCFLAGS) -o $@ $(KNCOBJECTS)
+
+%-KNL: $(KNLOBJECTS)
+	$(info )
+	$(info Linking the KNL executable:)
+	$(CXX) $(CXXFLAGS) $(KNLFLAGS) -o $@ $(KNLOBJECTS)
 
 .cc.o:
 	$(info )
 	$(info Compiling a CPU object file:)
-	$(CXX) -c $(CPUFLAGS) $(OPTFLAGS) -o "$@" "$<"
+	$(CXX) $(CXXFLAGS) -c $(CPUFLAGS) $(OPTFLAGS) -o "$@" "$<"
 
-.cc.oMIC:
+.cc.oKNC:
 	$(info )
-	$(info Compiling a MIC object file:)
-	$(CXX) -c $(MICFLAGS) $(OPTFLAGS) -o "$@" "$<"
+	$(info Compiling a KNC object file:)
+	$(CXX) $(CXXFLAGS) -c $(KNCFLAGS) $(OPTFLAGS) -o "$@" "$<"
+
+.cc.oKNL:
+	$(info )
+	$(info Compiling a KNL object file:)
+	$(CXX) $(CXXFLAGS) -c $(KNLFLAGS) $(OPTFLAGS) -o "$@" "$<"
 
 instructions: 
 	$(info )
 	$(info TO EXECUTE THE APPLICATION: )
 	$(info "make run-cpu" to run the application on the host CPU)
-	$(info "make run-mic" to run the application on the coprocessor)
+	$(info "make run-knc" to run the application on the coprocessor)
+	$(info "make run-knl" to run the application on the host KNL)
+	$(info )
+	$(info TO QUEUE THE APPLICATION FOR TORQUE: )
+	$(info "make queue-cpu" to queue application for the host CPU)
+	$(info "make queue-knc" to queue application for the coprocessor)
+	$(info "make queue-knl" to queue application for the host KNL)
 	$(info )
 
 run-cpu: app-CPU
-	./app-CPU
+	./app-CPU 
 
-run-mic: app-MIC
-	scp app-MIC mic0:~/
-	ssh mic0 LD_LIBRARY_PATH=$(MIC_LD_LIBRARY_PATH) ./app-MIC
+run-knc: app-KNC
+	scp app-KNC mic0:~/
+	ssh mic0 LD_LIBRARY_PATH=$(MIC_LD_LIBRARY_PATH) ./app-KNC 
+
+run-knl: app-KNL
+	./app-KNL 
+
+queue-cpu: app-CPU
+	echo "`pwd`/app-CPU" | qsub -l nodes=1:xeon -N lab-405-cpu
+
+queue-knc: app-KNC
+	echo "scp `pwd`/app-KNC mic0:~/; \
+	      ssh mic0 LD_LIBRARY_PATH=$(MIC_LD_LIBRARY_PATH) /home/guest/app-KNC" | qsub -l nodes=1:knc:coprocessor -N lab-405-knc
+
+queue-knl: app-KNL
+	echo "numactl -m 1 `pwd`/app-KNL" | qsub -l nodes=1:knl:xeonphi:flat -N lab-405-knl
 
 clean: 
-	rm -f $(CPUOBJECTS) $(MICOBJECTS) $(TARGET) *.optrpt
-
+	rm -f $(CPUOBJECTS) $(KNCOBJECTS) $(KNLOBJECTS) $(TARGET) *.optrpt
