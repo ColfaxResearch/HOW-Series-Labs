@@ -41,7 +41,7 @@ all: $(TARGET) instructions
 	$(info Compiling a MIC object file:)
 	$(CXX) -c $(MICFLAGS) $(OPTFLAGS) -o "$@" "$<"
 
-instructions: run-cpu run-mic
+instructions: run-cpu run-knc
 	$(info )
 
 run-cpu: app-CPU
@@ -50,7 +50,7 @@ run-cpu: app-CPU
 	$(info OMP_NUM_THREADS=... KMP_AFFINITY=... ./app-CPU)
 	$(info )
 
-run-mic: app-MIC
+run-knc: app-MIC
 	$(info )
 	$(info TO EXECUTE THIS APPLICATION ON COPROCESSOR, USE THE FOLLOWING COMMANDS: )
 	$(info scp app-MIC mic0:~/ )

@@ -9,7 +9,7 @@ loop fusion.
 
 0. Study  the workload in  worker.cc (function RunStatistics()  is the
    main  function)  and benchmark  it  on  the  host processor  ("make
-   run-cpu") and  on an Intel  Xeon Phi coprocessor  ("make run-mic").
+   run-cpu") and  on an Intel  Xeon Phi coprocessor  ("make run-knc").
    The  workload  simulates data  generation  and  processing using  a
    synthetic  application  that  generates  m  arrays  random  numbers
    (pipeline stage  1) and then, for each  array, computes statistical

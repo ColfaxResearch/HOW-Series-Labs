@@ -9,7 +9,7 @@ strip-mining and loop collapse.
 0. Study the code in worker.cc and also take a look at the values of m
    and n in main.cc What do you think will happen in the parallel loop
    in worker.cc?   Benchmark the  baseline implementation on  the host
-   ("make   run-cpu")  and  on   the  coprocessor   ("make  run-mic").
+   ("make   run-cpu")  and  on   the  coprocessor   ("make  run-knc").
    Optionally,  analyze the  application in  VTune using  the Advanced
    Hotspots analysis.   Specifically, take  a look at  the concurrency
    histogram  and at the  timeline in  the "Hotspots"  viewpoint.  You

@@ -36,15 +36,16 @@ all: $(TARGET) instructions
 run-cpu: app-CPU
 	MIC_ENV_PREFIX=PHI PHI_KMP_AFFINITY=compact,granularity=fine ./app-CPU	
 
+queue-cpu: app-CPU
+	echo "MIC_ENV_PREFIX=PHI PHI_KMP_AFFINITY=compact,granularity=fine `pwd`/app-CPU" | qsub -l nodes=1:xeon -N lab-410-cpu
+
 instructions: 
 	$(info )
 	$(info TO EXECUTE THE APPLICATION: )
 	$(info "make run-cpu" to run the application on the host CPU)
 	$(info )
-
-run-mic: 
-	$(info )
-	$(info Offload applicaion: No native execution on the coprocessor)
+	$(info TO QUEUE THE APPLICATION FOR TORQUE: )
+	$(info "make queue-cpu" to queue application for the host CPU)
 	$(info )
 
 clean: 

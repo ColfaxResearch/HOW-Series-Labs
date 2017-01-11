@@ -41,7 +41,7 @@ all: $(TARGET) instructions
 	$(info Compiling a MIC object file:)
 	$(CXX) -c $(MICFLAGS) $(OPTFLAGS) -o "$@" "$<"
 
-instructions: run-cpu run-mic
+instructions: run-cpu run-knc
 	$(info )
 
 run-cpu: app-CPU
@@ -51,7 +51,7 @@ run-cpu: app-CPU
 	$(info ./run-multiple-processes.sh )
 	$(info )
 
-run-mic: app-MIC
+run-knc: app-MIC
 	$(info )
 	$(info YOU MUST EDIT run-multiple-processes.sh TO OPTIMIZE THREAD AFFFINITY )
 	$(info TO EXECUTE THIS APPLICATION ON COPROCESSOR, USE THE FOLLOWING COMMANDS: )

@@ -4,7 +4,7 @@ Coprocessors",  second edition  (2015). The  book can  be obtained  at
 xeonphi.com/book
 
 1. Run the benchmark on the host with "make run-cpu" 
-and on the coprocessor with "make run-mic".
+and on the coprocessor with "make run-knc".
 Study the benchmark results with different
 scheduling modes.
 

@@ -28,7 +28,7 @@ MoveParticles().
 
 0. Study  the code, then  compile and run  the application to  get the
    baseline performance. To run the application on the host,  use  the
-   command "make run-cpu" and for coprocessor, use "make run-mic".
+   command "make run-cpu" and for coprocessor, use "make run-knc".
 
 1. Apply strength reduction for the calculation of force (the j-loop).
    You should be able to limit  the use of expensive operations to one

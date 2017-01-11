@@ -9,7 +9,7 @@ and using  compiler hints  that relax some  of the runtime  checks for
 data alignment and pointer aliasing.
 
 0. Obtain baseline performance on the host ("make run-cpu") and on the
-   coprocessor ("make run-mic").
+   coprocessor ("make run-knc").
 
 1.  Apply  strength  reduction  to  line  16.   compile  and  run  the
    application to see the performance improvement

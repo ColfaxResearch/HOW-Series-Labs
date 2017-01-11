@@ -8,7 +8,7 @@ to data on the performance of vectorized calculations.
 
 
 0.  First, compile  and run  the application  on the  host and  on the
-coprocessor  using  "make  run-cpu"  nd "make  run-mic".  Record  this
+coprocessor  using  "make  run-cpu"  nd "make  run-knc".  Record  this
 baseline performance.
 
 

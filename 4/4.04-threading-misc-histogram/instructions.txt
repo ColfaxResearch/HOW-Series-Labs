@@ -12,7 +12,7 @@ that fell  within each  age group (i.e.,  histogram bin). The  size of
 this bin is determined by the argument "group_width".
 
 0. Obtain baseline performance on the host ("make run-cpu") and on the
-   coprocessor   ("make   run-mic").   At   each  of   the   following
+   coprocessor   ("make   run-knc").   At   each  of   the   following
    instructions, measure performance  on the host as well  as the Xeon
    Phi coprocessor using native execution.
 
