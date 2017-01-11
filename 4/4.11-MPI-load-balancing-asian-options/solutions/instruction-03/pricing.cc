@@ -1,6 +1,3 @@
-
-
-
 #include <cmath>
 #include <mkl_vsl.h>
 #include <omp.h>

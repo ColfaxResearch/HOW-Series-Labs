@@ -1,6 +1,3 @@
-
-
-
 #include <cstdio>
 #include <omp.h>
 #include <cmath>

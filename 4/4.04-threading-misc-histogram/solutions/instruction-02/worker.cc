@@ -1,6 +1,3 @@
-
-
-
 void Histogram(const float* age, int* const hist, const int n, const float group_width,
     const int m) {
 #ifdef __MIC__

@@ -1,6 +1,3 @@
-
-
-
 #include <mpi.h>
 #include <mkl.h>
 #include <mkl_vsl.h>

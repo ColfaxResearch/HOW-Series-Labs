@@ -7,7 +7,7 @@ MIC_OMP_NUM_THREADS=4
 # END OF PARAMETERS TO MODIFY
 CXX = icpc
 CXXFLAGS=-qopenmp -mkl
-CPUFLAGS = $(CXXFLAGS) -xhost
+CPUFLAGS = $(CXXFLAGS) -xAVX
 MICFLAGS = $(CXXFLAGS) -mmic
 OPTFLAGS = -qopt-report -qopt-report-file=$@.optrpt
 

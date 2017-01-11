@@ -1,6 +1,6 @@
 CXX = icpc
 CXXFLAGS=-qopenmp
-CPUFLAGS = $(CXXFLAGS) -xhost
+CPUFLAGS = $(CXXFLAGS) -xAVX
 KNCFLAGS = $(CXXFLAGS) -mmic
 KNLFLAGS = $(CXXFLAGS) -xMIC_AVX512 -DKNLTILE
 OPTFLAGS = -qopt-report -qopt-report-file=$@.optrpt

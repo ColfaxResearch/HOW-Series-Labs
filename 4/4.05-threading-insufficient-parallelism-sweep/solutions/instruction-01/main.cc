@@ -1,6 +1,3 @@
-
-
-
 #include <malloc.h>
 #include <cmath>
 #include <omp.h>

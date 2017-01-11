@@ -1,6 +1,6 @@
 CXX = mpiicpc
 CXXFLAGS=-qopenmp -mkl -mt_mpi
-CPUFLAGS = $(CXXFLAGS) -xhost
+CPUFLAGS = $(CXXFLAGS) -xAVX
 MICFLAGS = $(CXXFLAGS) -mmic
 OPTFLAGS = -qopt-report -qopt-report-file=$@.optrpt
 

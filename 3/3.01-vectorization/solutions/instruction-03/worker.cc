@@ -1,6 +1,3 @@
-
-
-
 __attribute__((vector)) double my_scalar_add(double x1, double x2){
   return x1+x2;
 }

@@ -1,6 +1,6 @@
 CXX = icpc
 CXXFLAGS=
-CPUFLAGS = $(CXXFLAGS) -xhost
+CPUFLAGS = $(CXXFLAGS) -xAVX
 OPTFLAGS = -qopt-report -qopt-report-file=$@.optrpt
 
 CPUOBJECTS = matrix.o

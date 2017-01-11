@@ -1,6 +1,3 @@
-
-
-
 #include <mpi.h>
 #include <cstdio>
 

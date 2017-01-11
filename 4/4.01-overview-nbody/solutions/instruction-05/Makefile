@@ -1,6 +1,6 @@
 CXX = mpiicpc
 CXXFLAGS=-qopenmp -mkl
-CPUFLAGS = $(CXXFLAGS) -xhost
+CPUFLAGS = $(CXXFLAGS) -xAVX
 KNCFLAGS = $(CXXFLAGS) -mmic
 KNLFLAGS = $(CXXFLAGS) -xMIC_AVX512 -DKNLTILE
 OPTFLAGS = -qopt-report -qopt-report-file=$@.optrpt -fp-model fast=2

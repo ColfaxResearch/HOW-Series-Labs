@@ -1,5 +1,5 @@
 CXX = icpc
-CXXFLAGS = -g
+CXXFLAGS =
 
 OBJECTS = matrix.o
 

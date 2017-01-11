@@ -1,6 +1,3 @@
-
-
-
 void SumColumns(const int m, const int n, long* M, long* s){
 
   for (int i = 0; i < m; i++) {

@@ -1,6 +1,3 @@
-
-
-
 #pragma offload_attribute(push, target(mic))
 #include <cstdio>
 #pragma offload_attribute(pop)

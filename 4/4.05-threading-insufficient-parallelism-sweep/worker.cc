@@ -1,6 +1,3 @@
-
-
-
 void SumColumns(const int m, const int n, long* M, long* s){
 
   // Distribute rows across threads

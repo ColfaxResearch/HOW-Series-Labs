@@ -1,6 +1,3 @@
-
-
-
 #include <omp.h>
 
 void Histogram(const float* age, int* const hist, const int n, const float group_width,

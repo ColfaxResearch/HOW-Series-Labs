@@ -1,6 +1,3 @@
-
-
-
 #include <cstdlib>
 #include <omp.h>
 #include <mpi.h>

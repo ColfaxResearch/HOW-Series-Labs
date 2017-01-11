@@ -1,6 +1,3 @@
-
-
-
 #include <cmath>
 #pragma offload_attribute(push, target(mic))
 #include <cstdio>
@@ -22,7 +19,7 @@ int main(int argc, char* argv[]) {
   // Run once on the host and once on the coprocessor
   for (int offloadFlag=0; offloadFlag<=1; offloadFlag++) {
 
-#pragma offload target(mic) if(offloadFlag)
+#pragma offload target(mic) if(offloadFlag) optional
     {
       double* A=(double*)_mm_malloc(n*sizeof(double), 64);
       double* B=(double*)_mm_malloc(n*sizeof(double), 64);

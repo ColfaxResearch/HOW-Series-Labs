@@ -1,6 +1,3 @@
-
-
-
 #include <omp.h>
 #include <mpi.h>
 #include "options.h"

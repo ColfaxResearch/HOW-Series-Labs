@@ -1,6 +1,3 @@
-
-
-
 // Inputs;
 // float* age        - The array of size "n" containing the ages of the sample
 // int* hist         - The destination array for histogram, with size "m"

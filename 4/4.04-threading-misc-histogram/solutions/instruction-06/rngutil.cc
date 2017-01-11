@@ -1,6 +1,3 @@
-
-
-
 #include "rngutil.h"
 
 #define RNGUTILPADDING 1024L

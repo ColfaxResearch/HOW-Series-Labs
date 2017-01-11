@@ -1,16 +1,16 @@
 CXX = icpc
 CXXFLAGS=-qopenmp
-CPUFLAGS = $(CXXFLAGS) -xhost
-MICFLAGS = $(CXXFLAGS) -mmic
+KNCFLAGS = $(CXXFLAGS) -mmic
+KNLFLAGS = $(CXXFLAGS) -xMIC_AVX512
 OPTFLAGS = -qopt-report -qopt-report-file=$@.optrpt
 
 CPUOBJECTS = copy.o
-MICOBJECTS = 
+KNLOBJECTS = copy.o
 
-TARGET=app-CPU
+TARGET=app-CPU app-KNL
 CXX=icpc
 
-.SUFFIXES: .o .cc .oMIC
+.SUFFIXES: .o .cc .oKNL
 
 all: $(TARGET) instructions
 
@@ -19,20 +19,20 @@ all: $(TARGET) instructions
 	$(info Linking the CPU executable:)
 	$(CXX) $(CPUFLAGS) -o $@ $(CPUOBJECTS)
 
-%-MIC: $(MICOBJECTS)
+%-KNL: $(KNCOBJECTS)
 	$(info )
-	$(info Linking the MIC executable:)
-	$(CXX) $(MICFLAGS) -o $@ $(MICOBJECTS)
+	$(info Linking the KNL executable:)
+	$(CXX) $(KNLFLAGS) -o $@ $(KNLOBJECTS)
 
 .cc.o:
 	$(info )
 	$(info Compiling a CPU object file:)
 	$(CXX) -c $(CPUFLAGS) $(OPTFLAGS) -o "$@" "$<"
 
-.cc.oMIC:
+.cc.oKNL:
 	$(info )
-	$(info Compiling a MIC object file:)
-	$(CXX) -c $(MICFLAGS) $(OPTFLAGS) -o "$@" "$<"
+	$(info Compiling a KNL object file:)
+	$(CXX) -c $(KNLFLAGS) $(OPTFLAGS) -o "$@" "$<"
 
 instructions: run-cpu
 	$(info )
@@ -43,6 +43,22 @@ run-cpu: app-CPU
 	$(info OMP_NUM_THREADS=... KMP_AFFINITY=... MIC_ENV_PREFIX=... ..._KMP_PLACE_THREADS=... ./app-CPU)
 	$(info )
 
+run-knl: app-KNL
+	$(info )
+	$(info TO EXECUTE THIS APPLICATION ON A XEON PHI PROCESSOR, USE THE FOLLOWING COMMANDS: )
+	$(info KMP_PLACE_THREADS=...C,...t KMP_AFFINITY=... ./app-KNL )
+	$(info )
+
+queue-cpu: app-CPU
+	$(info )
+	$(info TO EXECUTE THIS APPLICATION ON CPU, USE THE FOLLOWING COMMAND: )
+	$(info OMP_NUM_THREADS=... KMP_AFFINITY=... ./app-CPU)
+	$(info )
+	echo "`pwd`/app-CPU" | qsub -l nodes=1:xeon -N lab-407-cpu
+
+queue-knl: app-KNL
+	echo "`numactl -m 1 pwd`/app-KNL" | qsub -l nodes=1:knl:xeonphi:flat -N lab-407-knl
+
 clean: 
-	rm -f $(CPUOBJECTS) $(MICOBJECTS) $(TARGET) *.optrpt
+	rm -f $(CPUOBJECTS) $(KNLOBJECTS) $(TARGET) *.optrpt
 
