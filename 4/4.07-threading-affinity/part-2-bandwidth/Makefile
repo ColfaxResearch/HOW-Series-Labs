@@ -57,7 +57,7 @@ queue-cpu: app-CPU
 	echo "`pwd`/app-CPU" | qsub -l nodes=1:xeon -N lab-407-cpu
 
 queue-knl: app-KNL
-	echo "`numactl -m 1 pwd`/app-KNL" | qsub -l nodes=1:knl:xeonphi:flat -N lab-407-knl
+	echo "numactl -m 1 `pwd`/app-KNL" | qsub -l nodes=1:knl:xeonphi:flat -N lab-407-knl
 
 clean: 
 	rm -f $(CPUOBJECTS) $(KNLOBJECTS) $(TARGET) *.optrpt

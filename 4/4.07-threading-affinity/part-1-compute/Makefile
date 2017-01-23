@@ -85,7 +85,7 @@ queue-knc: app-KNC
 	      ssh mic0 LD_LIBRARY_PATH=$(MIC_LD_LIBRARY_PATH) /home/guest/app-KNC $(NSIZE)" | qsub -l nodes=1:knc:coprocessor -N lab-407-knc
 
 queue-knl: app-KNL
-	echo "`numactl -m 1 pwd`/app-KNL" | qsub -l nodes=1:knl:xeonphi:flat -N lab-407-knl
+	echo "numactl -m 1 `pwd`/app-KNL" | qsub -l nodes=1:knl:xeonphi:flat -N lab-407-knl
 
 clean: 
 	rm -f $(CPUOBJECTS) $(KNCOBJECTS) $(KNLOBJECTS) $(TARGET) *.optrpt

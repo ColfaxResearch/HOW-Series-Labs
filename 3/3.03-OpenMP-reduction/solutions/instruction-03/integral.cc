@@ -4,15 +4,15 @@
 #include <omp.h>
 
 int main(){
-  const double x_upper_bound = 1.0;
-  const double x_lower_bound = 0.0;
-
-  const int nSteps = 1000000000; 
-  const double dx = (x_upper_bound - x_lower_bound)/nSteps;
-
-  const int nTrials = 10; 
+  const int nTrials = 5; 
 
   for(int trial = 0; trial < nTrials; trial++) {
+    const double x_upper_bound = 1.0 + trial;
+    const double x_lower_bound = 0.0;
+
+    const int nSteps = 1000000000; 
+    const double dx = (x_upper_bound - x_lower_bound)/nSteps;
+
     double integral = 0.0;
     double partial_sum = 0.0;
 
