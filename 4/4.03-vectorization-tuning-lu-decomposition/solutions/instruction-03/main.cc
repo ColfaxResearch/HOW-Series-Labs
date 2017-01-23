@@ -24,16 +24,15 @@ void LU_decomp(const int n,
     L[i*n+i]=1.0f;
   }
   for (int b = 0; b < n; b++) {
-    const int jMin = b - b%tile;
+    const int jMin = (b+1) - (b+1)%tile;
     // Strength reduction:
     const float recAbb = 1.0f/A[b*n + b];
     for (int i = b+1; i < n; i++) {
       L[i*n + b] = A[i*n + b]*recAbb;
       // Aligned data hint:
 #pragma vector aligned
-      // Pointer disambiguation:
-#pragma simd
       // Regularized patern of vector loop:
+#pragma simd
       for (int j = jMin; j < n; j++) 
 	A[i*n + j] -= L[i*n+b]*A[b*n + j];
     }
