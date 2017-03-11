@@ -1,11 +1,11 @@
 CXX = icpc
 CXXFLAGS=-qopenmp
-KNCFLAGS = $(CXXFLAGS) -mmic
-KNLFLAGS = $(CXXFLAGS) -xMIC_AVX512
+CPUFLAGS = $(CXXFLAGS) -xAVX
+KNLFLAGS = $(CXXFLAGS) -xMIC_AVX512 -DNO_OFFLOAD
 OPTFLAGS = -qopt-report -qopt-report-file=$@.optrpt
 
 CPUOBJECTS = copy.o
-KNLOBJECTS = copy.o
+KNLOBJECTS = copy.oKNL
 
 TARGET=app-CPU app-KNL
 CXX=icpc
@@ -19,7 +19,7 @@ all: $(TARGET) instructions
 	$(info Linking the CPU executable:)
 	$(CXX) $(CPUFLAGS) -o $@ $(CPUOBJECTS)
 
-%-KNL: $(KNCOBJECTS)
+%-KNL: $(KNLOBJECTS)
 	$(info )
 	$(info Linking the KNL executable:)
 	$(CXX) $(KNLFLAGS) -o $@ $(KNLOBJECTS)

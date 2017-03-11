@@ -19,7 +19,9 @@ int main(int argc, char* argv[]) {
   // Run once on the host and once on the coprocessor
   for (int offloadFlag=0; offloadFlag<=1; offloadFlag++) {
 
+#ifndef DNO_OFFLOAD
 #pragma offload target(mic) if(offloadFlag) optional
+#endif
     {
       double* A=(double*)_mm_malloc(n*sizeof(double), 64);
       double* B=(double*)_mm_malloc(n*sizeof(double), 64);
