@@ -26,7 +26,7 @@ all: $(TARGET) instructions
 	$(info Linking the KNC executable:)
 	$(CXX) $(KNCFLAGS) -o $@ $(KNCOBJECTS)
 
-%-KNL: $(KNCOBJECTS)
+%-KNL: $(KNLOBJECTS)
 	$(info )
 	$(info Linking the KNL executable:)
 	$(CXX) $(KNLFLAGS) -o $@ $(KNLOBJECTS)
